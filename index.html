@@ -1664,7 +1664,7 @@ textarea.code {
   <div id="floatPageWire" style="background:#1a1a1a;border-radius:6px;overflow:hidden;position:relative;">
   </div>
   <div id="floatPageAdd" style="margin-top:10px;display:flex;gap:8px;justify-content:flex-end;">
-    <button onclick="insertBlock('pagebreak','','','','','')" style="font-size:11px;padding:4px 12px;border-radius:6px;border:1px dashed var(--b2);background:none;color:var(--t3);cursor:pointer;">+ Halaman Baru</button>
+    <button onclick="insertPageBreakFromFloat()" style="font-size:11px;padding:4px 12px;border-radius:6px;border:1px dashed var(--b2);background:none;color:var(--t3);cursor:pointer;">+ Halaman Baru</button>
   </div>
 </div>
 
@@ -3016,7 +3016,7 @@ function renderEditorNode(id) {
     <div class="ed-foot">
       <span class="as-msg" id="asMsg">Auto-save aktif</span>
       <div style="flex:1"></div>
-      <button class="btn btn-ghost btn-sm" onclick="switchTab('preview')">Preview</button>
+      <button class="btn btn-ghost btn-sm" onclick="renderNodePreview(selNodeId)">Preview</button>
       <button class="btn btn-primary btn-sm" onclick="saveNodeContent()">Simpan</button>
     </div>`;
 
@@ -3743,6 +3743,35 @@ function renderStat(attrs={}) {
 /* ══════════════════════════════════════════
    PREVIEW
 ══════════════════════════════════════════ */
+function renderNodePreview(nodeId) {
+  if (!D || !nodeId) { switchTab('preview'); return; }
+  const node = getNode(nodeId);
+  if (!node) { switchTab('preview'); return; }
+
+  // Save current content first
+  saveNodeContent(true);
+
+  const bab = D.babs?.find(b => b.id === nodeId || findNodeInBab(b, nodeId)) || {};
+  function findNodeInBab(n, tid) {
+    if (n.id === tid) return true;
+    return (n.children||[]).some(c => findNodeInBab(c, tid));
+  }
+
+  const rawPages = splitRawByPageBreak(node.rawContent || '');
+  if (rawPages.length === 0) rawPages.push('');
+
+  const scroll = document.getElementById('pvScroll');
+  let arabicNum = 1;
+  const pages = rawPages.map(raw => renderContentPage(raw, node, bab, arabicNum++));
+  scroll.innerHTML = pages.join('');
+  applyZoom();
+
+  const pageWord = pages.length > 1 ? `${pages.length} halaman` : '1 halaman';
+  document.getElementById('pvInfo').textContent = `${node.num} ${node.name} — ${pageWord}`;
+
+  switchTab('preview');
+}
+
 function renderPreview() {
   if (!D) return;
   const scroll = document.getElementById('pvScroll');
@@ -4575,6 +4604,11 @@ function insertBlock(typeRaw, size, nodeNum, nodeName, babNum, babName) {
   ta.dispatchEvent(new Event('input'));
 
   updateCapacityIndicator();
+  // Jump float preview to last page (where block was inserted)
+  const ta2 = document.getElementById('edRaw');
+  if (ta2) {
+    _floatPageIdx = Math.max(0, getPageBlocks(ta2.value).length - 1);
+  }
   showFloatLayout();
   setTimeout(refreshFloatLayout, 50);
   toast(`Blok ditambahkan`);
@@ -4594,83 +4628,87 @@ function getPageBlocks(raw) {
 }
 
 function renderWireframePage(blocks) {
-  const WIRE_W = window.innerWidth - 64; // panel width minus padding
-  const WIRE_H = Math.round(WIRE_W * (247/210)); // A4 proportion (body area)
-
+  // Fixed dimensions — representasi proporsi, bukan skala A4
+  const WIRE_W = 200;
+  const WIRE_H = 240; // total height budget px
   const FRAC = { full:1,'two-third':0.667,half:0.5,third:0.333,quarter:0.25 };
 
-  let mainBlocks = [];
-  let sideBlocks = [];
+  let mainBlocks = [], sideBlocks = [];
   blocks.forEach(b => {
     if (b.type==='side' || b.type==='insight') sideBlocks.push(b);
     else if (['body','image','diagram','stat','opener'].includes(b.type)) mainBlocks.push(b);
   });
 
   const hasSide = sideBlocks.length > 0;
-  const mainW = hasSide ? Math.round(WIRE_W * 0.72) : WIRE_W;
-  const sideW = hasSide ? WIRE_W - mainW - 4 : 0;
+  const mainW = hasSide ? Math.round(WIRE_W * 0.73) : WIRE_W;
+  const sideW = hasSide ? WIRE_W - mainW - 2 : 0;
 
-  function blockColor(b) {
-    if (b.type==='body')    return { bg:'#4a9eff22', pattern:'lines' };
-    if (b.type==='image')   return { bg:'#88888833', pattern:'diagonal' };
-    if (b.type==='diagram') return { bg:'#ACC42A22', pattern:'diagram' };
-    if (b.type==='stat')    return { bg:'#006CB822', pattern:'stat' };
-    if (b.type==='opener')  return { bg:'#ED1B2F22', pattern:'opener' };
-    return { bg:'#ffffff11', pattern:'none' };
-  }
-
-  function wireBlock(b, w, totalH) {
+  function wireBlock(b, w) {
     const frac = b.type==='opener' ? 1.0 : (FRAC[b.attrs?.size] || 0.25);
-    const h = Math.round(frac * totalH);
-    const { bg, pattern } = blockColor(b);
-    let inner = '';
-    if (pattern === 'lines') {
-      const n = Math.max(2, Math.floor(h/6));
-      inner = Array.from({length:n},(_,i) =>
-        `<div style="height:1px;background:#4a9eff66;margin:${Math.floor((h-n)/(n+1))}px 4px 0;width:${i===n-1?'60%':'90%'}"></div>`
+    const h = Math.max(8, Math.round(frac * WIRE_H));
+
+    if (b.type==='body') {
+      // 3-5 lines max, evenly spaced
+      const nLines = frac >= 1 ? 5 : frac >= 0.5 ? 4 : frac >= 0.333 ? 3 : 2;
+      const lineSpacing = Math.floor((h - nLines * 2) / (nLines + 1));
+      const lines = Array.from({length:nLines},(_,i) =>
+        `<div style="height:2px;background:#4a9eff66;border-radius:1px;width:${i===nLines-1?'55%':'90%'};margin-top:${lineSpacing}px;"></div>`
       ).join('');
-    } else if (pattern === 'diagonal') {
-      inner = `<div style="width:100%;height:100%;background:repeating-linear-gradient(45deg,#88888833 0,#88888833 2px,transparent 2px,transparent 8px);display:flex;align-items:center;justify-content:center;font-size:${Math.min(h/2,16)}px">🖼</div>`;
-    } else if (pattern === 'diagram') {
-      inner = `<div style="display:flex;align-items:center;justify-content:center;height:100%;gap:3px;padding:4px">
-        <div style="width:8px;height:8px;background:#ACC42A66;border-radius:1px"></div>
-        <div style="font-size:7px;color:#ACC42A">→</div>
-        <div style="width:8px;height:8px;background:#ACC42A66;border-radius:1px"></div>
-        <div style="font-size:7px;color:#ACC42A">→</div>
-        <div style="width:8px;height:8px;background:#ACC42A66;border-radius:1px"></div>
-      </div>`;
-    } else if (pattern === 'stat') {
-      inner = `<div style="display:flex;align-items:center;justify-content:center;height:100%;border-left:2px solid #006CB8;font-size:${Math.min(h*0.4,14)}px;font-weight:800;color:#006CB8;padding-left:4px">42</div>`;
-    } else if (pattern === 'opener') {
-      inner = `<div style="display:flex;align-items:center;height:100%;border-left:3px solid #ED1B2F;padding-left:6px;font-size:8px;color:#ED1B2F88">Opener</div>`;
+      return `<div style="width:${w}px;height:${h}px;background:#4a9eff11;border-bottom:1px solid #ffffff0a;padding:0 4px;overflow:hidden;">${lines}</div>`;
     }
-    return `<div style="width:${w}px;height:${h}px;background:${bg};border-bottom:1px solid #ffffff11;flex-shrink:0;overflow:hidden;position:relative;">${inner}</div>`;
+
+    if (b.type==='image') {
+      return `<div style="width:${w}px;height:${h}px;background:repeating-linear-gradient(45deg,#55555533 0,#55555533 3px,#33333322 3px,#33333322 10px);border-bottom:1px solid #ffffff0a;display:flex;align-items:center;justify-content:center;font-size:${Math.min(h*0.35,18)}px;">🖼</div>`;
+    }
+
+    if (b.type==='diagram') {
+      return `<div style="width:${w}px;height:${h}px;background:#ACC42A11;border-bottom:1px solid #ffffff0a;display:flex;align-items:center;justify-content:center;gap:3px;">
+        <div style="width:10px;height:10px;background:#ACC42A66;border-radius:2px;"></div>
+        <div style="font-size:8px;color:#ACC42A99;">→</div>
+        <div style="width:10px;height:10px;background:#ACC42A66;border-radius:2px;"></div>
+        <div style="font-size:8px;color:#ACC42A99;">→</div>
+        <div style="width:10px;height:10px;background:#ACC42A66;border-radius:2px;"></div>
+      </div>`;
+    }
+
+    if (b.type==='stat') {
+      return `<div style="width:${w}px;height:${h}px;background:#006CB811;border-left:2px solid #006CB8;border-bottom:1px solid #ffffff0a;display:flex;align-items:center;justify-content:center;">
+        <span style="font-size:${Math.min(h*0.45,20)}px;font-weight:800;color:#006CB8;">42</span>
+      </div>`;
+    }
+
+    if (b.type==='opener') {
+      return `<div style="width:${w}px;height:${h}px;background:#ED1B2F11;border-left:3px solid #ED1B2F;border-bottom:1px solid #ffffff0a;display:flex;align-items:center;padding-left:6px;">
+        <span style="font-size:8px;color:#ED1B2F88;font-weight:600;">OPENER</span>
+      </div>`;
+    }
+
+    return `<div style="width:${w}px;height:${h}px;background:#ffffff08;border-bottom:1px solid #ffffff0a;"></div>`;
   }
 
-  const mainHtml = mainBlocks.map(b => wireBlock(b, mainW, WIRE_H)).join('');
+  const mainHtml = mainBlocks.map(b => wireBlock(b, mainW)).join('');
   const sideHtml = sideBlocks.map(b => {
-    const bg = b.type==='insight' ? '#2D4A6B44' : '#006CB811';
+    const bg = b.type==='insight' ? '#2D4A6B55' : '#006CB822';
     const border = b.type==='insight' ? '#2D4A6B' : '#006CB8';
-    return `<div style="background:${bg};border-left:2px solid ${border};padding:4px;font-size:7px;color:${border};margin-bottom:2px;">${b.type==='insight'?'💡':'📚'}</div>`;
+    return `<div style="background:${bg};border-left:2px solid ${border};padding:4px;margin-bottom:2px;font-size:10px;">${b.type==='insight'?'💡':'📚'}</div>`;
   }).join('');
 
-  const mainCol = `<div style="width:${mainW}px;display:flex;flex-direction:column;">${mainHtml}</div>`;
-  const sideCol = hasSide ? `<div style="width:${sideW}px;padding:4px;display:flex;flex-direction:column;">${sideHtml}</div>` : '';
-
-  // Capacity bar
   let totalFrac = 0;
-  mainBlocks.forEach(b => {
-    totalFrac += b.type==='opener' ? 1.0 : (FRAC[b.attrs?.size] || 0);
-  });
-  const pct = Math.min(Math.round(totalFrac*100), 100);
+  mainBlocks.forEach(b => { totalFrac += b.type==='opener' ? 1.0 : (FRAC[b.attrs?.size]||0); });
+  const pct = Math.min(Math.round(totalFrac*100),100);
   const barColor = totalFrac >= 1.0 ? '#ef4444' : totalFrac >= 0.75 ? '#f59e0b' : '#22c55e';
-  const capBar = `<div style="height:3px;background:#ffffff11;">
-    <div style="height:3px;width:${pct}%;background:${barColor};transition:width .3s;"></div>
-  </div>`;
+  const pctLabel = `${pct}%`;
 
-  return `<div style="width:${WIRE_W}px;">${capBar}
-    <div style="display:flex;width:${WIRE_W}px;min-height:${Math.max(60,WIRE_H*0.4)}px;">
-      ${mainCol}${sideCol}
+  return `<div style="width:${WIRE_W}px;">
+    <div style="display:flex;align-items:center;gap:6px;padding:4px 0 6px;">
+      <div style="flex:1;height:4px;background:#ffffff11;border-radius:2px;">
+        <div style="height:4px;width:${pct}%;background:${barColor};border-radius:2px;transition:width .3s;"></div>
+      </div>
+      <span style="font-size:9px;color:${barColor};font-family:monospace;font-weight:700;">${pctLabel}</span>
+    </div>
+    <div style="display:flex;border:1px solid #ffffff15;border-radius:3px;overflow:hidden;min-height:20px;">
+      <div style="display:flex;flex-direction:column;flex:1;">${mainHtml}</div>
+      ${hasSide ? `<div style="width:${sideW}px;background:#ffffff05;padding:4px;border-left:1px solid #ffffff15;">${sideHtml}</div>` : ''}
     </div>
   </div>`;
 }
@@ -4706,6 +4744,21 @@ function refreshFloatLayout() {
 function floatLayoutPrev() {
   _floatPageIdx = Math.max(0, _floatPageIdx - 1);
   refreshFloatLayout();
+}
+
+function insertPageBreakFromFloat() {
+  const ta = document.getElementById('edRaw');
+  if (!ta) return;
+  const cur = ta.value;
+  const sep = cur.length > 0 && !cur.endsWith('\n') ? '\n' : '';
+  ta.value = cur + sep + '<pagebreak/>\n';
+  ta.dispatchEvent(new Event('input'));
+  // Jump to new page
+  const total = getPageBlocks(ta.value).length;
+  _floatPageIdx = total - 1;
+  updateCapacityIndicator();
+  setTimeout(refreshFloatLayout, 50);
+  toast('Halaman baru ditambahkan');
 }
 
 function floatLayoutNext() {
