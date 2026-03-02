@@ -885,7 +885,7 @@ textarea.code {
   color:#006CB8; letter-spacing:.1em; text-transform:uppercase;
   margin-bottom:2mm; border-bottom:.3mm solid #ddd; padding-bottom:1.5mm;
 }
-.a4-insight { background:#1a1818; color:white; padding:3.5mm; }
+.a4-insight { background:#2D4A6B; color:white; padding:3.5mm; border-radius:.8mm; }
 .a4-insight-title {
   font-family:'Geist Mono',monospace; font-size:5.5pt;
   letter-spacing:.12em; text-transform:uppercase;
@@ -929,20 +929,15 @@ textarea.code {
 
 /* Image placeholder */
 .a4-img-ph {
-  background:#e0e0e0;
+  background: repeating-linear-gradient(
+    45deg, #d8d8d8, #d8d8d8 4px, #e8e8e8 4px, #e8e8e8 18px
+  );
   display:flex; flex-direction:column; align-items:center; justify-content:center;
   min-height:50mm; margin:3mm 0; gap:3mm;
-  border-radius:1mm; position:relative; overflow:hidden;
+  border-radius:1mm;
 }
-.a4-img-ph::before {
-  content:''; position:absolute; inset:0;
-  background: repeating-linear-gradient(
-    45deg, #d0d0d0, #d0d0d0 4px, #e0e0e0 4px, #e0e0e0 16px
-  );
-  opacity:0.4;
-}
-.a4-img-ph-ico { font-size:20pt; color:#aaa; position:relative; z-index:1; }
-.a4-img-ph-label { font-size:6.5pt; color:#888; font-style:italic; position:relative; z-index:1; font-weight:600; text-align:center; padding:0 4mm; }
+.a4-img-ph-ico { font-size:20pt; color:#999; }
+.a4-img-ph-label { font-size:6.5pt; color:#777; font-style:italic; font-weight:600; text-align:center; padding:0 4mm; }
 
 /* Front matter pages */
 .a4-fm-title { font-size:14pt; color:#006CB8; margin-bottom:8mm; font-weight:600; }
@@ -3307,15 +3302,31 @@ function renderContentPage(raw, node, bab, num) {
     return `<div class="a4">${hdr}<div class="a4-body" style="padding:${m.t}mm ${m.r}mm ${m.b}mm ${m.l}mm;">${body}</div>${ftr}</div>`;
   }
 
+  // Separate blocks into main column and side column
+  let mainHtml = '';
+  let sideHtml = '';
+  const hasSideBlocks = sty.showSide   && blocks.some(b => b.type==='side');
+  const hasInsBlocks  = sty.showInsight && blocks.some(b => b.type==='insight');
+  const hasSideCol = hasSideBlocks || hasInsBlocks;
+
   blocks.forEach(b => {
-    if (b.type==='opener') body += renderOpener(b.content, b.attrs?.style||'subtle', node, t);
-    else if (b.type==='body') body += renderBodyBlock(b.content);
-    else if (b.type==='side' && sty.showSide) body += renderSideBlock(b.content);
-    else if (b.type==='insight' && sty.showInsight) body += renderInsightBlock(b.content);
-    else if (b.type==='diagram') body += renderDiagram(b.content, b.attrs);
-    else if (b.type==='image') body += renderImagePH(b.attrs);
-    else if (b.type==='text' && b.content) body += `<div class="a4-body-text">${b.content.split('\n\n').map(p=>`<p>${escRaw(p)}</p>`).join('')}</div>`;
+    if (b.type==='opener') mainHtml += renderOpener(b.content, b.attrs?.style||'subtle', node, t);
+    else if (b.type==='body') mainHtml += renderBodyBlock(b.content);
+    else if (b.type==='side' && sty.showSide) sideHtml += renderSideBlock(b.content);
+    else if (b.type==='insight' && sty.showInsight) sideHtml += renderInsightBlock(b.content);
+    else if (b.type==='diagram') mainHtml += renderDiagram(b.content, b.attrs);
+    else if (b.type==='image') mainHtml += renderImagePH(b.attrs);
+    else if (b.type==='text' && b.content) mainHtml += `<div class="a4-body-text">${b.content.split('\n\n').map(p=>`<p>${escRaw(p)}</p>`).join('')}</div>`;
   });
+
+  if (hasSideCol) {
+    body += `<div style="display:flex;gap:4mm;align-items:flex-start;">
+      <div style="flex:3;min-width:0;">${mainHtml}</div>
+      <div style="flex:1;min-width:0;">${sideHtml}</div>
+    </div>`;
+  } else {
+    body += mainHtml;
+  }
 
   return `<div class="a4">${hdr}<div class="a4-body" style="padding:${m.t}mm ${m.r}mm ${m.b}mm ${m.l}mm;">${body}</div>${ftr}</div>`;
 }
@@ -3378,20 +3389,25 @@ function renderBodyBlock(content) {
   return `<div class="a4-body-text">${paras.map(p=>`<p>${escRaw(p.replace(/\n/g,' '))}</p>`).join('')}</div>`;
 }
 
-function renderSideBlock(content) {
+function renderSideBlock(content, attrs={}) {
   const lines = content.split('\n').filter(l=>l.trim());
+  const title = attrs.title || lines[0] || 'Referensi';
+  const body  = attrs.title ? lines : lines.slice(1);
   return `<div class="a4-side">
-    <div class="a4-side-title">📚 Referensi</div>
-    <div style="font-weight:600;font-style:italic;margin-bottom:1mm;font-size:6.5pt;">${esc(lines[0]||'')}</div>
-    <div style="font-size:6pt;color:#888;margin-bottom:2mm;">${esc(lines.slice(1,3).join(' · '))}</div>
-    <div style="font-size:6pt;color:#666;font-style:italic;">${esc(lines.slice(3).join(' '))}</div>
+    <div class="a4-side-title">📚 ${esc(title)}</div>
+    ${body.map((l,i) => i===0
+      ? `<div style="font-weight:600;font-style:italic;margin-bottom:1mm;font-size:6.5pt;">${esc(l)}</div>`
+      : `<div style="font-size:6pt;color:#666;margin-bottom:1mm;">${esc(l)}</div>`
+    ).join('')}
   </div>`;
 }
 
-function renderInsightBlock(content) {
-  const items = content.split('\n').filter(l=>l.trim());
+function renderInsightBlock(content, attrs={}) {
+  const lines = content.split('\n').filter(l=>l.trim());
+  const title = attrs.title || lines[0] || 'Implikasi Strategis';
+  const items = attrs.title ? lines : lines.slice(1);
   return `<div class="a4-insight">
-    <div class="a4-insight-title">💡 Implikasi Strategis</div>
+    <div class="a4-insight-title">💡 ${esc(title)}</div>
     <ul>${items.map(i=>`<li>${esc(i)}</li>`).join('')}</ul>
   </div>`;
 }
@@ -3729,7 +3745,7 @@ yang membahas aspek penting dalam laporan.`,
     variants: [
       { label: 'Standar', key: 'standard' },
     ],
-    syntax: () => `<insight>\nPoin implikasi strategis pertama\nPoin implikasi kedua yang perlu diperhatikan\nPoin ketiga sebagai rekomendasi tindak lanjut\n</insight>`,
+    syntax: () => `<insight>\nJudul Panel Insight\nPoin implikasi strategis pertama\nPoin implikasi kedua yang perlu diperhatikan\nPoin ketiga sebagai rekomendasi tindak lanjut\n</insight>`,
     preview: () => renderInsightBlock('Implikasi strategis pertama dari temuan bagian ini\nImplikasi kedua yang membutuhkan perhatian manajemen\nRekomendasi konkret sebagai tindak lanjut'),
     prompt: (nodeNum, nodeName, babNum, babName) =>
 `Kamu adalah penulis laporan profesional.
@@ -3756,7 +3772,7 @@ Format output (setiap poin = 1 baris, tanpa nomor):
     ],
     syntax: (v) => {
       if (v === 'definition') return `<side>\nIstilah Kunci\nDefinisi lengkap dari istilah ini dalam konteks laporan.\nSumber: nama sumber, tahun\n</side>`;
-      return `<side>\nJudul Referensi\nNama Penulis / Lembaga, Tahun\nKutipan atau poin penting dari referensi ini.\n</side>`;
+      return `<side>\nJudul Panel Referensi\nNama Penulis / Lembaga, Tahun\nKutipan atau poin penting dari referensi ini.\n</side>`;
     },
     preview: (v) => renderSideBlock(
       v==='definition'
@@ -4019,7 +4035,7 @@ Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu 
   const previewNode = {
     id: 'preview', num: _bsNodeNum, name: _bsNodeName,
     rawContent: previewRaw,
-    stylePreset: 'academic-full', styleOverride: {}
+    stylePreset: 'academic-full', styleOverride: { showSide: true, showInsight: true }
   };
   const previewBab = { num: _bsBabNum, name: _bsBabName };
   const pageHtml = renderContentPage(previewNode.rawContent, previewNode, previewBab, 1);
