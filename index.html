@@ -675,11 +675,113 @@ textarea.code {
 /* Block Palette */
 .block-palette { background:var(--s2); border:1px solid var(--b1); border-radius:var(--radius); padding:12px 14px; }
 .bp-title { font-size:10px; font-weight:600; color:var(--t4); text-transform:uppercase; letter-spacing:.08em; font-family:var(--font-mono); margin-bottom:10px; }
-.bp-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:6px; }
-.bp-btn { display:flex; flex-direction:column; align-items:center; gap:4px; padding:10px 6px; border-radius:8px; border:1px solid var(--b1); background:var(--s3); color:var(--t2); cursor:pointer; transition:all .15s; }
-.bp-btn:active { background:var(--s4); border-color:var(--pl-blue); }
-.bp-icon { font-size:16px; line-height:1; }
-.bp-label { font-size:10px; font-weight:500; color:var(--t3); }
+.bp-categories { display:flex; flex-direction:column; gap:8px; }
+.bp-cat-label { font-size:9px; font-weight:700; color:var(--t4); text-transform:uppercase; letter-spacing:.1em; margin-bottom:2px; }
+.bp-size-row { display:flex; gap:6px; flex-wrap:wrap; }
+.bp-size-btn {
+  display:flex; flex-direction:column; align-items:center; gap:4px;
+  padding:6px 8px; border-radius:8px; border:1px solid var(--b1);
+  background:var(--s3); cursor:pointer; transition:all .15s;
+  min-width:52px;
+}
+.bp-size-btn:active, .bp-size-btn:hover { border-color:var(--pl-blue); background:var(--s4); }
+.bp-size-btn.warn { border-color:#f59e0b !important; }
+.bp-size-btn.blocked { opacity:.4; cursor:not-allowed; }
+.bp-size-btn-wide { min-width:64px; }
+.bp-btn-pagebreak { border-style:dashed; }
+.bp-thumb {
+  width:44px; background:var(--s4); border-radius:3px;
+  display:flex; flex-direction:column; align-items:stretch;
+  justify-content:flex-start; min-height:14px; overflow:hidden;
+  position:relative;
+}
+/* Text lines pattern */
+.bp-thumb-body {
+  display:flex; flex-direction:column; gap:2px; padding:3px;
+  background:var(--s4);
+}
+.bp-thumb-body .tl {
+  height:2px; border-radius:1px; background:#4a9eff88;
+}
+.bp-thumb-body .tl:last-child { width:65%; }
+
+/* Image pattern */
+.bp-thumb-image {
+  background:repeating-linear-gradient(45deg,#88888844 0,#88888844 3px,#44444422 3px,#44444422 10px);
+  display:flex; align-items:center; justify-content:center;
+  font-size:16px;
+}
+
+/* Diagram patterns */
+.bp-thumb-chain {
+  display:flex; align-items:center; justify-content:center;
+  gap:2px; padding:4px 2px; background:var(--s4);
+}
+.bp-thumb-chain .cn { width:8px; height:8px; background:#ACC42A88; border-radius:1px; flex-shrink:0; }
+.bp-thumb-chain .ca { font-size:6px; color:#ACC42A; flex-shrink:0; }
+.bp-thumb-comparison {
+  display:flex; flex-direction:column; gap:1px; padding:3px;
+  background:var(--s4);
+}
+.bp-thumb-comparison .ch { height:3px; background:#ACC42A88; border-radius:1px; margin-bottom:1px; }
+.bp-thumb-comparison .cr { height:2px; background:#ACC42A44; border-radius:1px; }
+.bp-thumb-list {
+  display:flex; flex-direction:column; gap:2px; padding:3px;
+  background:var(--s4);
+}
+.bp-thumb-list .li { display:flex; align-items:center; gap:2px; }
+.bp-thumb-list .li::before { content:'•'; font-size:6px; color:#ACC42A; flex-shrink:0; }
+.bp-thumb-list .li div { height:2px; background:#ACC42A55; border-radius:1px; flex:1; }
+.bp-thumb-hierarchy {
+  display:flex; flex-direction:column; gap:2px; padding:3px;
+  background:var(--s4);
+}
+.bp-thumb-hierarchy .hl0 { height:2px; background:#ACC42A88; border-radius:1px; }
+.bp-thumb-hierarchy .hl1 { height:2px; background:#ACC42A55; border-radius:1px; margin-left:4px; }
+.bp-thumb-hierarchy .hl2 { height:2px; background:#ACC42A33; border-radius:1px; margin-left:8px; }
+
+/* Stat patterns */
+.bp-thumb-stat-hero {
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  background:#006CB811; border-left:2px solid #006CB8; padding:2px;
+}
+.bp-thumb-stat-hero .sv { font-size:11px; font-weight:800; color:#006CB8; line-height:1; }
+.bp-thumb-stat-hero .sl { font-size:5px; color:#006CB888; margin-top:1px; }
+.bp-thumb-stat-port {
+  display:flex; flex-direction:column; gap:2px; padding:3px;
+  background:#006CB811; border-left:2px solid #006CB8;
+}
+.bp-thumb-stat-port .sr { display:flex; align-items:center; gap:2px; }
+.bp-thumb-stat-port .sn { font-size:7px; font-weight:700; color:#006CB8; }
+.bp-thumb-stat-port .st { height:2px; background:#006CB844; border-radius:1px; flex:1; }
+.bp-thumb-stat-land {
+  display:flex; flex-direction:row; align-items:center; justify-content:space-around;
+  padding:4px 2px; background:#006CB811; border-left:2px solid #006CB8;
+}
+.bp-thumb-stat-land .sc { display:flex; flex-direction:column; align-items:center; gap:1px; }
+.bp-thumb-stat-land .sn { font-size:7px; font-weight:700; color:#006CB8; }
+.bp-thumb-stat-land .st { font-size:4px; color:#006CB888; }
+.bp-thumb-stat-ctx {
+  display:flex; flex-direction:row; align-items:center; gap:3px;
+  padding:3px; background:#006CB811; border-left:2px solid #006CB8;
+}
+.bp-thumb-stat-ctx .sn { font-size:9px; font-weight:800; color:#006CB8; flex-shrink:0; }
+.bp-thumb-stat-ctx .lines { display:flex; flex-direction:column; gap:2px; flex:1; }
+.bp-thumb-stat-ctx .lines div { height:2px; background:#006CB844; border-radius:1px; }
+
+/* Panel samping */
+.bp-thumb-insight { background:#2D4A6B; display:flex; align-items:center; justify-content:center; font-size:14px; }
+.bp-thumb-side    { background:#f4f7fb; border-left:2px solid #006CB8; display:flex; align-items:center; justify-content:center; font-size:14px; }
+.bp-thumb-opener  { background:#ED1B2F11; border-left:3px solid #ED1B2F; display:flex; align-items:center; justify-content:center; font-size:14px; }
+.bp-thumb-pagebreak { border:1px dashed var(--t4); display:flex; align-items:center; justify-content:center; font-size:14px; background:transparent; }
+.bp-size-label { font-size:9px; font-weight:600; color:var(--t3); white-space:nowrap; }
+.bp-capacity {
+  margin-top:10px; padding:6px 10px; border-radius:6px;
+  font-size:10px; font-family:var(--font-mono); display:none;
+}
+.bp-capacity.warn { display:block; background:#f59e0b22; color:#f59e0b; border:1px solid #f59e0b44; }
+.bp-capacity.over { display:block; background:#ef444422; color:#ef4444; border:1px solid #ef444444; }
+.bp-capacity.ok   { display:block; background:#22c55e22; color:#22c55e; border:1px solid #22c55e44; }
 /* Showcase Modal */
 .bs-header { padding:4px 0 12px; border-bottom:1px solid var(--b1); margin-bottom:12px; }
 .bs-block-type { font-size:16px; font-weight:700; color:var(--t1); margin-bottom:2px; }
@@ -1545,6 +1647,24 @@ textarea.code {
       <button class="btn btn-ghost btn-sm" onclick="copyBlockPrompt()">Copy Prompt</button>
       <button class="btn btn-primary btn-sm" onclick="insertBlockSyntax()">Insert ke Editor</button>
     </div>
+  </div>
+</div>
+
+<!-- FLOATING LAYOUT PREVIEW -->
+<div id="floatLayout" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:200;background:var(--s1);border-top:1px solid var(--b1);border-radius:16px 16px 0 0;padding:12px 16px 24px;box-shadow:0 -8px 32px rgba(0,0,0,.4);">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+    <div style="font-size:11px;font-weight:600;color:var(--t3);font-family:var(--font-mono);text-transform:uppercase;letter-spacing:.08em;">Layout Halaman</div>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <button onclick="floatLayoutPrev()" style="background:none;border:1px solid var(--b1);border-radius:6px;color:var(--t2);padding:2px 8px;font-size:14px;cursor:pointer;">‹</button>
+      <span id="floatPageLabel" style="font-size:11px;color:var(--t2);font-family:var(--font-mono);min-width:60px;text-align:center;">Hal 1</span>
+      <button onclick="floatLayoutNext()" style="background:none;border:1px solid var(--b1);border-radius:6px;color:var(--t2);padding:2px 8px;font-size:14px;cursor:pointer;">›</button>
+      <button onclick="closeFloatLayout()" style="background:none;border:none;color:var(--t4);font-size:18px;cursor:pointer;padding:0 4px;">×</button>
+    </div>
+  </div>
+  <div id="floatPageWire" style="background:#1a1a1a;border-radius:6px;overflow:hidden;position:relative;">
+  </div>
+  <div id="floatPageAdd" style="margin-top:10px;display:flex;gap:8px;justify-content:flex-end;">
+    <button onclick="insertBlock('pagebreak','','','','','')" style="font-size:11px;padding:4px 12px;border-radius:6px;border:1px dashed var(--b2);background:none;color:var(--t3);cursor:pointer;">+ Halaman Baru</button>
   </div>
 </div>
 
@@ -2787,23 +2907,7 @@ function renderEditorNode(id) {
     </div>
 
     ${!isSpecial ? `
-    <div class="style-bar">
-      <div class="style-bar-row">
-        <span class="style-bar-label">Preset</span>
-        <select class="preset-sel" id="edPreset" onchange="onPresetChange()">${presetOpts}</select>
-        <button class="reset-btn" onclick="resetOverride()">reset</button>
-      </div>
-      <div class="style-bar-row">
-        <span class="style-bar-label">Override</span>
-        <div class="toggle-group">
-          <button class="tog${showSideVal===true?' on':''}" id="togSide" onclick="toggleOv('showSide')">
-            <span class="dot"></span>Side
-          </button>
-          <button class="tog${showInsightVal===true?' on':''}" id="togIns" onclick="toggleOv('showInsight')">
-            <span class="dot"></span>Insight
-          </button>
-        </div>
-      </div>
+    <div class="style-bar" style="padding:8px 14px;">
       <div class="style-bar-row">
         <span class="style-bar-label">Aksen</span>
         <div class="accent-sel">
@@ -2814,28 +2918,94 @@ function renderEditorNode(id) {
     </div>
     ` : ''}
 
-    <div class="block-palette">
-      <div class="bp-title">Blok Konten</div>
-      <div class="bp-grid">
-        <button class="bp-btn" onclick="showBlockShowcase('opener','${esc(node.num||'')}','${esc(node.name||'')}','${esc(bab?.num||'')}','${esc(bab?.name||'')}')">
-          <span class="bp-icon">◈</span><span class="bp-label">Opener</span>
-        </button>
-        <button class="bp-btn" onclick="showBlockShowcase('body','${esc(node.num||'')}','${esc(node.name||'')}','${esc(bab?.num||'')}','${esc(bab?.name||'')}')">
-          <span class="bp-icon">¶</span><span class="bp-label">Body</span>
-        </button>
-        <button class="bp-btn" onclick="showBlockShowcase('insight','${esc(node.num||'')}','${esc(node.name||'')}','${esc(bab?.num||'')}','${esc(bab?.name||'')}')">
-          <span class="bp-icon">💡</span><span class="bp-label">Insight</span>
-        </button>
-        <button class="bp-btn" onclick="showBlockShowcase('side','${esc(node.num||'')}','${esc(node.name||'')}','${esc(bab?.num||'')}','${esc(bab?.name||'')}')">
-          <span class="bp-icon">📚</span><span class="bp-label">Side</span>
-        </button>
-        <button class="bp-btn" onclick="showBlockShowcase('diagram','${esc(node.num||'')}','${esc(node.name||'')}','${esc(bab?.num||'')}','${esc(bab?.name||'')}')">
-          <span class="bp-icon">◆</span><span class="bp-label">Diagram</span>
-        </button>
-        <button class="bp-btn" onclick="showBlockShowcase('image','${esc(node.num||'')}','${esc(node.name||'')}','${esc(bab?.num||'')}','${esc(bab?.name||'')}')">
-          <span class="bp-icon">🖼</span><span class="bp-label">Gambar</span>
-        </button>
+        <div class="block-palette">
+      <div class="bp-title">Blok Konten — tap untuk pilih ukuran</div>
+      <div class="bp-categories">
+
+        <div class="bp-cat-label">Teks</div>
+        <div class="bp-size-row">
+          ${['full','two-third','half','third','quarter'].map((s,i) => {
+            const h = {full:56,'two-third':38,half:28,third:19,quarter:14}[s];
+            const lbl = {full:'Full','two-third':'2/3',half:'1/2',third:'1/3',quarter:'1/4'}[s];
+            const n = Math.max(2, Math.floor(h/5));
+            const lines = Array.from({length:n},(_,j)=>`<div class="tl" style="width:${j===n-1?'65%':'100%'}"></div>`).join('');
+            return `<button class="bp-size-btn" onclick="insertBlock('body','${s}','${esc(node.num||'')}','${esc(node.name||'')}','${esc(bab?.num||'')}','${esc(bab?.name||'')}')" title="Body ${lbl}">
+              <div class="bp-thumb" style="height:${h}px"><div class="bp-thumb-body" style="height:${h}px">${lines}</div></div>
+              <div class="bp-size-label">${lbl}</div>
+            </button>`;
+          }).join('')}
+        </div>
+
+        <div class="bp-cat-label">Gambar</div>
+        <div class="bp-size-row">
+          ${['full','two-third','half','third'].map(s => {
+            const h = {full:56,'two-third':38,half:28,third:19}[s];
+            const lbl = {full:'Full','two-third':'2/3',half:'1/2',third:'1/3'}[s];
+            return `<button class="bp-size-btn" onclick="insertBlock('image','${s}','${esc(node.num||'')}','${esc(node.name||'')}','${esc(bab?.num||'')}','${esc(bab?.name||'')}')" title="Image ${lbl}">
+              <div class="bp-thumb" style="height:${h}px"><div class="bp-thumb-image" style="height:${h}px">🖼</div></div>
+              <div class="bp-size-label">${lbl}</div>
+            </button>`;
+          }).join('')}
+        </div>
+
+        <div class="bp-cat-label">Diagram</div>
+        <div class="bp-size-row">
+          ${[['chain','half',28],['chain','third',19],['comparison','half',28],['comparison','third',19],['list','third',19],['hierarchy','half',28]].map(([t,s,h]) => {
+            const lbl = t[0].toUpperCase()+t.slice(1,4)+' '+{half:'1/2',third:'1/3'}[s];
+            const inner = t==='chain'
+              ? `<div class="bp-thumb-chain" style="height:${h}px"><div class="cn"></div><div class="ca">→</div><div class="cn"></div><div class="ca">→</div><div class="cn"></div></div>`
+              : t==='comparison'
+              ? `<div class="bp-thumb-comparison" style="height:${h}px"><div class="ch"></div>${Array.from({length:3},()=>'<div class="cr"></div>').join('')}</div>`
+              : t==='list'
+              ? `<div class="bp-thumb-list" style="height:${h}px">${Array.from({length:3},()=>'<div class="li"><div></div></div>').join('')}</div>`
+              : `<div class="bp-thumb-hierarchy" style="height:${h}px"><div class="hl0"></div><div class="hl1"></div><div class="hl2"></div><div class="hl1"></div></div>`;
+            return `<button class="bp-size-btn" onclick="insertBlock('diagram-${t}','${s}','${esc(node.num||'')}','${esc(node.name||'')}','${esc(bab?.num||'')}','${esc(bab?.name||'')}')" title="${lbl}">
+              <div class="bp-thumb" style="height:${h}px">${inner}</div>
+              <div class="bp-size-label">${lbl}</div>
+            </button>`;
+          }).join('')}
+        </div>
+
+        <div class="bp-cat-label">Statistik</div>
+        <div class="bp-size-row">
+          ${[['hero','quarter',14],['hero','third',19],['portrait3','third',19],['landscape3','quarter',14],['landscape3','third',19],['contextual','third',19]].map(([v,s,h]) => {
+            const lbl = {hero:'Hero',portrait3:'Port',landscape3:'Land3',contextual:'Ctx'}[v]+' '+{quarter:'1/4',third:'1/3',half:'1/2'}[s];
+            const inner = v==='hero'
+              ? `<div class="bp-thumb-stat-hero" style="height:${h}px"><div class="sv">42</div><div class="sl">label</div></div>`
+              : v==='portrait3'
+              ? `<div class="bp-thumb-stat-port" style="height:${h}px"><div class="sr"><div class="sn">1</div><div class="st"></div></div><div class="sr"><div class="sn">2</div><div class="st"></div></div><div class="sr"><div class="sn">3</div><div class="st"></div></div></div>`
+              : v==='landscape3'
+              ? `<div class="bp-thumb-stat-land" style="height:${h}px"><div class="sc"><div class="sn">1</div><div class="st">A</div></div><div class="sc"><div class="sn">2</div><div class="st">B</div></div><div class="sc"><div class="sn">3</div><div class="st">C</div></div></div>`
+              : `<div class="bp-thumb-stat-ctx" style="height:${h}px"><div class="sn">42</div><div class="lines"><div></div><div style="width:80%"></div></div></div>`;
+            return `<button class="bp-size-btn" onclick="insertBlock('stat-${v}','${s}','${esc(node.num||'')}','${esc(node.name||'')}','${esc(bab?.num||'')}','${esc(bab?.name||'')}')" title="${lbl}">
+              <div class="bp-thumb" style="height:${h}px">${inner}</div>
+              <div class="bp-size-label">${lbl}</div>
+            </button>`;
+          }).join('')}
+        </div>
+
+        <div class="bp-cat-label">Panel Samping & Struktural</div>
+        <div class="bp-size-row">
+          <button class="bp-size-btn" onclick="insertBlock('insight','auto','${esc(node.num||'')}','${esc(node.name||'')}','${esc(bab?.num||'')}','${esc(bab?.name||'')}')">
+            <div class="bp-thumb bp-thumb-insight" style="height:28px">💡</div>
+            <div class="bp-size-label">Insight</div>
+          </button>
+          <button class="bp-size-btn" onclick="insertBlock('side','auto','${esc(node.num||'')}','${esc(node.name||'')}','${esc(bab?.num||'')}','${esc(bab?.name||'')}')">
+            <div class="bp-thumb bp-thumb-side" style="height:28px">📚</div>
+            <div class="bp-size-label">Referensi</div>
+          </button>
+          <button class="bp-size-btn" onclick="insertBlock('opener','full','${esc(node.num||'')}','${esc(node.name||'')}','${esc(bab?.num||'')}','${esc(bab?.name||'')}')">
+            <div class="bp-thumb bp-thumb-opener" style="height:28px">◈</div>
+            <div class="bp-size-label">Opener</div>
+          </button>
+          <button class="bp-size-btn bp-btn-pagebreak" onclick="insertBlock('pagebreak','','${esc(node.num||'')}','${esc(node.name||'')}','${esc(bab?.num||'')}','${esc(bab?.name||'')}')">
+            <div class="bp-thumb bp-thumb-pagebreak" style="height:28px">⊕</div>
+            <div class="bp-size-label">+ Halaman</div>
+          </button>
+        </div>
+
       </div>
+      <div class="bp-capacity" id="bpCapacity"></div>
     </div>
 
     <div class="field">
@@ -2851,6 +3021,7 @@ function renderEditorNode(id) {
     </div>`;
 
   setupAutoSave();
+  setTimeout(updateCapacityIndicator, 100);
 }
 
 function setupAutoSave() {
@@ -2861,6 +3032,8 @@ function setupAutoSave() {
     if (m) { m.textContent = 'Menyimpan…'; m.className = 'as-msg'; }
     asTimer = setTimeout(() => {
       saveNodeContent(true);
+      updateCapacityIndicator();
+      refreshFloatLayout();
       const m2 = document.getElementById('asMsg');
       if (m2) { m2.textContent = '✓ Tersimpan'; m2.className = 'as-msg ok'; setTimeout(()=>{ const m3=document.getElementById('asMsg'); if(m3){m3.textContent='Auto-save aktif';m3.className='as-msg';} },2000); }
     }, 900);
@@ -3045,8 +3218,8 @@ function openAddBM() {
 ══════════════════════════════════════════ */
 function parseTags(raw) {
   const blocks = [];
-  // Match: self-closing <image .../> OR paired <tag>...</tag> OR <pagebreak/>
-  const tagRe = /<(pagebreak|toc)\s*\/?>|<(image)([^>]*)\/?>|<(cover|endorsement|identity|foreword|opener|body|side|insight|diagram)([^>]*)>([\s\S]*?)<\/\4>/gi;
+  // Match: self-closing <image/> <stat/> OR paired <tag>...</tag> OR <pagebreak/>
+  const tagRe = /<(pagebreak|toc)\s*\/?>|<(image|stat)([^>]*)\/?>|<(cover|endorsement|identity|foreword|opener|body|side|insight|diagram)([^>]*)>([\s\S]*?)<\/\4>/gi;
   let lastIdx = 0; let m;
   while ((m = tagRe.exec(raw)) !== null) {
     if (m.index > lastIdx) {
@@ -3057,9 +3230,9 @@ function parseTags(raw) {
       // pagebreak/toc
       blocks.push({ type: m[1].toLowerCase() });
     } else if (m[2]) {
-      // self-closing image
+      // self-closing image or stat
       const attrs = parseAttrs(m[3]);
-      blocks.push({ type:'image', attrs, content:'' });
+      blocks.push({ type: m[2].toLowerCase(), attrs, content:'' });
     } else {
       // paired tag
       const type = m[4].toLowerCase();
@@ -3332,11 +3505,12 @@ function renderContentPage(raw, node, bab, num) {
 
   blocks.forEach(b => {
     if (b.type==='opener') mainHtml += renderOpener(b.content, b.attrs?.style||'subtle', node, t);
-    else if (b.type==='body') mainHtml += renderBodyBlock(b.content);
+    else if (b.type==='body') mainHtml += renderBodyBlock(b.content, b.attrs);
     else if (b.type==='side' && sty.showSide) sideHtml += renderSideBlock(b.content);
     else if (b.type==='insight' && sty.showInsight) sideHtml += renderInsightBlock(b.content);
     else if (b.type==='diagram') mainHtml += renderDiagram(b.content, b.attrs);
     else if (b.type==='image') { imgCounter++; mainHtml += renderImagePH(b.attrs, imgCounter); }
+    else if (b.type==='stat') mainHtml += renderStat(b.attrs);
     else if (b.type==='text' && b.content) mainHtml += `<div class="a4-body-text">${b.content.split('\n\n').map(p=>`<p>${escRaw(p)}</p>`).join('')}</div>`;
   });
 
@@ -3405,9 +3579,13 @@ function renderOpener(content, style, node, t) {
   </div>`;
 }
 
-function renderBodyBlock(content) {
+function renderBodyBlock(content, attrs={}) {
   const paras = content.split(/\n\n+/).filter(p=>p.trim());
-  return `<div class="a4-body-text">${paras.map(p=>`<p>${escRaw(p.replace(/\n/g,' '))}</p>`).join('')}</div>`;
+  const size = attrs?.size;
+  const heights = { 'full':247, 'two-third':165, 'half':124, 'third':82, 'quarter':62 };
+  const h = heights[size];
+  const style = h ? `min-height:${h}mm;max-height:${h}mm;overflow:hidden;` : '';
+  return `<div class="a4-body-text" style="${style}">${paras.map(p=>`<p>${escRaw(p.replace(/\n/g,' '))}</p>`).join('')}</div>`;
 }
 
 function renderSideBlock(content, attrs={}) {
@@ -3434,13 +3612,20 @@ function renderInsightBlock(content, attrs={}) {
 }
 
 function renderDiagram(content, attrs={}) {
+  const size = attrs.size;
+  const heights = { 'full':247,'two-third':165,'half':124,'third':82,'quarter':62 };
+  const h = heights[size];
+  const wrapSize = (html) => h
+    ? `<div style="min-height:${h}mm;max-height:${h}mm;overflow:hidden;">${html}</div>`
+    : html;
+
   const type = attrs.type || 'list';
   const lines = content.split('\n').filter(l=>l.trim());
   if (type==='chain') {
     const items = lines.join(' → ').split('→').map(s=>s.trim()).filter(Boolean);
-    return `<div class="a4-diag"><div class="a4-diag-title">◆ Diagram</div>
+    return wrapSize(`<div class="a4-diag"><div class="a4-diag-title">◆ Diagram</div>
       <div class="a4-diag-chain">${items.map((item,i)=>`<div class="a4-diag-chain-item">${esc(item)}</div>${i<items.length-1?'<span class="a4-diag-chain-arrow">→</span>':''}`).join('')}</div>
-    </div>`;
+    </div>`);
   }
   if (type==='comparison') {
     const headers = lines[0]?.split('|').map(s=>s.trim())||[];
@@ -3448,9 +3633,9 @@ function renderDiagram(content, attrs={}) {
       const cells = l.split('|').map(s=>s.trim());
       return `<tr>${cells.map(c=>`<td>${esc(c)}</td>`).join('')}</tr>`;
     });
-    return `<div class="a4-diag"><div class="a4-diag-title">◆ Perbandingan</div>
+    return wrapSize(`<div class="a4-diag"><div class="a4-diag-title">◆ Perbandingan</div>
       <table class="a4-diag-comparison"><thead><tr>${headers.map(h=>`<th>${esc(h)}</th>`).join('')}</tr></thead><tbody>${rows.join('')}</tbody></table>
-    </div>`;
+    </div>`);
   }
   if (type==='hierarchy') {
     const items = lines.map(l => {
@@ -3458,20 +3643,24 @@ function renderDiagram(content, attrs={}) {
       const cls = indent===0?'h-root':indent<=2?'h-l1':'h-l2';
       return `<div class="${cls}">${esc(l.trim())}</div>`;
     });
-    return `<div class="a4-diag"><div class="a4-diag-title">◆ Hierarki</div><div class="a4-diag-hierarchy">${items.join('')}</div></div>`;
+    return wrapSize(`<div class="a4-diag"><div class="a4-diag-title">◆ Hierarki</div><div class="a4-diag-hierarchy">${items.join('')}</div></div>`);
   }
   // list (default)
-  return `<div class="a4-diag"><div class="a4-diag-title">◆ Daftar</div>
+  return wrapSize(`<div class="a4-diag"><div class="a4-diag-title">◆ Daftar</div>
     <ul class="a4-diag-list">${lines.map(l=>`<li>${esc(l)}</li>`).join('')}</ul>
-  </div>`;
+  </div>`);
 }
 
 function renderImagePH(attrs={}, imgIndex=null) {
   const label = attrs.placeholder || 'Gambar / Grafik';
   const caption = attrs.caption || '';
   const indexStr = imgIndex !== null ? `Gambar ${imgIndex}` : 'Gambar';
+  const size = attrs.size;
+  const heights = { 'full':220, 'two-third':145, 'half':105, 'third':65, 'quarter':45 };
+  const h = heights[size] || 50;
+  const phStyle = `min-height:${h}mm;`;
   return `<div class="a4-img-wrap">
-    <div class="a4-img-ph">
+    <div class="a4-img-ph" style="${phStyle}">
       <div class="a4-img-ph-ico">🖼</div>
       <div class="a4-img-ph-label">${esc(label)}</div>
     </div>
@@ -3481,6 +3670,75 @@ function renderImagePH(attrs={}, imgIndex=null) {
     </div>
   </div>`;
 }
+
+function renderStat(attrs={}) {
+  const variant = attrs.variant || 'hero';
+  const size    = attrs.size    || 'quarter';
+  const heights = { 'full':247, 'two-third':165, 'half':124, 'third':82, 'quarter':62 };
+  const h = heights[size] || 62;
+
+  // Default placeholder data per variant
+  const defaults = {
+    hero:        [{ value:'2,4 M', unit:'Rp', label:'Total Investasi Program' }],
+    portrait3:   [{ value:'847',  unit:'',   label:'KK Penerima Manfaat' },
+                  { value:'50jt', unit:'Rp', label:'Dana Bergulir' },
+                  { value:'40%',  unit:'↑',  label:'Peningkatan Pendapatan' }],
+    landscape2:  [{ value:'847',  unit:'KK', label:'Penerima' },
+                  { value:'40%',  unit:'↑',  label:'Naik' }],
+    landscape3:  [{ value:'847',  unit:'KK', label:'Penerima' },
+                  { value:'50jt', unit:'Rp', label:'Dana' },
+                  { value:'40%',  unit:'↑',  label:'Naik' }],
+    contextual:  [{ value:'847',  unit:'KK', label:'Menerima manfaat langsung dari program pemberdayaan ekonomi ini sejak 2023.' }],
+  };
+
+  const items = defaults[variant] || defaults.hero;
+  const accent = '#006CB8';
+  const baseStyle = `min-height:${h}mm;max-height:${h}mm;overflow:hidden;background:#f4f7fb;border-radius:1.5mm;margin:2mm 0;padding:3mm;display:flex;flex-direction:column;justify-content:center;border-left:2mm solid ${accent};`;
+
+  if (variant === 'hero') {
+    const it = items[0];
+    return `<div style="${baseStyle}align-items:center;text-align:center;">
+      <div style="font-size:7pt;color:#888;letter-spacing:.1em;text-transform:uppercase;font-family:'Geist Mono',monospace;margin-bottom:1mm;">${esc(it.unit)}</div>
+      <div style="font-size:32pt;font-weight:800;color:${accent};line-height:1;">${esc(it.value)}</div>
+      <div style="font-size:7pt;color:#555;margin-top:2mm;font-weight:500;">${esc(it.label)}</div>
+    </div>`;
+  }
+
+  if (variant === 'portrait3') {
+    const rows = items.map(it => `
+      <div style="display:flex;align-items:baseline;gap:2mm;padding:2mm 0;border-bottom:.2mm solid #dde3ec;">
+        <div style="font-size:18pt;font-weight:800;color:${accent};line-height:1;">${esc(it.value)}</div>
+        <div style="font-size:8pt;font-weight:600;color:${accent};">${esc(it.unit)}</div>
+        <div style="font-size:6.5pt;color:#555;flex:1;">${esc(it.label)}</div>
+      </div>`).join('');
+    return `<div style="${baseStyle}">${rows}</div>`;
+  }
+
+  if (variant === 'landscape2' || variant === 'landscape3') {
+    const cols = items.map(it => `
+      <div style="flex:1;text-align:center;padding:1mm 2mm;border-right:.2mm solid #dde3ec;">
+        <div style="font-size:16pt;font-weight:800;color:${accent};line-height:1;">${esc(it.value)}</div>
+        <div style="font-size:6pt;font-weight:600;color:${accent};margin:.5mm 0;">${esc(it.unit)}</div>
+        <div style="font-size:5.5pt;color:#555;">${esc(it.label)}</div>
+      </div>`).join('');
+    return `<div style="${baseStyle}flex-direction:row;align-items:center;padding:2mm;">${cols}</div>`;
+  }
+
+  if (variant === 'contextual') {
+    const it = items[0];
+    return `<div style="${baseStyle}flex-direction:row;align-items:center;gap:4mm;">
+      <div style="text-align:center;min-width:20mm;">
+        <div style="font-size:22pt;font-weight:800;color:${accent};line-height:1;">${esc(it.value)}</div>
+        <div style="font-size:7pt;font-weight:600;color:${accent};">${esc(it.unit)}</div>
+      </div>
+      <div style="width:.3mm;background:#dde3ec;align-self:stretch;"></div>
+      <div style="font-size:7pt;color:#444;line-height:1.6;flex:1;">${esc(it.label)}</div>
+    </div>`;
+  }
+
+  return '';
+}
+
 
 /* ══════════════════════════════════════════
    PREVIEW
@@ -3700,6 +3958,29 @@ function printAll() {
    BLOCK SHOWCASE
 ══════════════════════════════════════════ */
 
+// ── Size system ─────────────────────────────────────
+const SIZE_HEIGHTS = {
+  'full':      247,
+  'two-third': 165,
+  'half':      124,
+  'third':     82,
+  'quarter':   62,
+};
+
+const LOREM_POOL_W = 'Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua ut enim ad minim veniam quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur excepteur sint occaecat cupidatat non proident sunt in culpa qui officia deserunt mollit anim id est laborum sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium totam rem aperiam eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt neque porro quisquam est qui dolorem ipsum quia dolor sit amet consectetur adipisci velit'.split(' ');
+
+const LOREM_WORDS = { 'full':492, 'two-third':322, 'half':237, 'third':153, 'quarter':110 };
+
+function loremForSize(size) {
+  const n = LOREM_WORDS[size] || 237;
+  const words = [];
+  while (words.length < n) words.push(...LOREM_POOL_W);
+  const w = words.slice(0, n);
+  const paras = [];
+  for (let i = 0; i < w.length; i += 70) paras.push(w.slice(i, i+70).join(' '));
+  return paras.join('\n\n');
+}
+
 const BLOCK_SHOWCASE = {
   opener: {
     label: 'Opener — Pembuka Section',
@@ -3730,29 +4011,14 @@ Gunakan bahasa Indonesia formal dan padat.`,
   body: {
     label: 'Body — Narasi Utama',
     variants: [
-      { label: 'Paragraf', key: 'paragraph' },
-      { label: 'Dengan Side', key: 'with-side' },
-      { label: 'Dengan Insight', key: 'with-insight' },
+      { label: 'Full', key: 'full' },
+      { label: '2/3', key: 'two-third' },
+      { label: '1/2', key: 'half' },
+      { label: '1/3', key: 'third' },
+      { label: '1/4', key: 'quarter' },
     ],
-    syntax: (v) => {
-      if (v === 'with-side') return `<body>\nNarasi utama bagian ini.\n\nParagraf kedua melanjutkan pembahasan.\n</body>\n\n<side>\nJudul Referensi\nPenulis, Tahun\nKutipan atau catatan penting\n</side>`;
-      if (v === 'with-insight') return `<body>\nNarasi utama bagian ini.\n\nParagraf kedua melanjutkan pembahasan.\n</body>\n\n<insight>\nPoin implikasi pertama\nPoin implikasi kedua\nPoin implikasi ketiga\n</insight>`;
-      return `<body>\nNarasi utama bagian ini ditulis dalam paragraf yang mengalir.\n\nParagraf kedua melanjutkan pembahasan dengan detail lebih lanjut.\n</body>`;
-    },
-    preview: (v, nodeNum, nodeName) => {
-      const sample = `<body>\nBagian ${nodeNum} ${nodeName} membahas aspek penting yang menjadi fondasi analisis dalam laporan ini. Pemahaman yang komprehensif terhadap topik ini diperlukan sebelum melanjutkan ke bagian berikutnya.\n\nDalam konteks laporan ini, perlu dipahami bahwa setiap elemen memiliki keterkaitan sistemik yang saling memperkuat argumen utama yang dibangun sepanjang dokumen.\n</body>${
-        v==='with-side'?'\n\n<side>\nReferensi Utama\nNama Penulis, 2024\nKutipan atau catatan penting terkait\n</side>':
-        v==='with-insight'?'\n\n<insight>\nImplikasi strategis pertama dari temuan ini\nImplikasi kedua yang perlu diperhatikan manajemen\nRekomendasi tindak lanjut ke depan\n</insight>':''}`;
-      const blocks = parseTags(sample);
-      const t = TYPOGRAPHY[D?.settings?.typography||'scholarly']||TYPOGRAPHY.scholarly;
-      let html = '';
-      blocks.forEach(b => {
-        if (b.type==='body') html += renderBodyBlock(b.content);
-        else if (b.type==='side') html += renderSideBlock(b.content);
-        else if (b.type==='insight') html += renderInsightBlock(b.content);
-      });
-      return html;
-    },
+    syntax: (v) => '<body size="' + v + '">\n' + loremForSize(v) + '\n</body>',
+    preview: (v) => '<body size="' + v + '">\n' + loremForSize(v) + '\n</body>',
     prompt: (nodeNum, nodeName, babNum, babName) =>
 `Kamu adalah penulis laporan profesional.
 
@@ -3761,15 +4027,13 @@ ${nodeNum} — ${nodeName}
 (Bagian dari ${babNum} ${babName})
 
 Ketentuan:
-- 2-3 paragraf, masing-masing 80-120 kata
 - Bahasa Indonesia formal dan akademis
 - Setiap paragraf memiliki satu ide utama
-- Gunakan format: <body>...[isi]...</body>
+- Gunakan format: <body size="half">...[isi]...</body>
+  (pilih size: full ~500 kata, two-third ~320 kata, half ~240 kata, third ~150 kata, quarter ~110 kata)
 
-Konteks: bagian ini berada dalam ${babName}, 
-yang membahas aspek penting dalam laporan.`,
+Konteks: bagian ini berada dalam ${babName}.`,
   },
-
   insight: {
     label: 'Insight — Implikasi Strategis',
     variants: [
@@ -3826,72 +4090,110 @@ Format:
   diagram: {
     label: 'Diagram — Visualisasi Data',
     variants: [
-      { label: 'Chain', key: 'chain' },
-      { label: 'Comparison', key: 'comparison' },
-      { label: 'List', key: 'list' },
-      { label: 'Hierarchy', key: 'hierarchy' },
+      { label: 'Chain — 1/2', key: 'chain-half' },
+      { label: 'Chain — 1/3', key: 'chain-third' },
+      { label: 'Comparison — 1/2', key: 'comparison-half' },
+      { label: 'Comparison — 1/3', key: 'comparison-third' },
+      { label: 'List — 1/3', key: 'list-third' },
+      { label: 'List — 1/4', key: 'list-quarter' },
+      { label: 'Hierarchy — 1/2', key: 'hierarchy-half' },
+      { label: 'Hierarchy — 1/3', key: 'hierarchy-third' },
     ],
     syntax: (v) => {
-      if (v==='chain') return `<diagram type="chain">\nLangkah Pertama\nLangkah Kedua\nLangkah Ketiga\nHasil Akhir\n</diagram>`;
-      if (v==='comparison') return `<diagram type="comparison">\nAspek|Kondisi A|Kondisi B\nKriteria 1|Nilai A|Nilai B\nKriteria 2|Nilai A|Nilai B\n</diagram>`;
-      if (v==='hierarchy') return `<diagram type="hierarchy">\nLevel Utama\n  Sub-level 1\n  Sub-level 2\n    Detail level\n</diagram>`;
-      return `<diagram type="list">\nItem pertama dalam daftar\nItem kedua dalam daftar\nItem ketiga dalam daftar\n</diagram>`;
+      const [type, size] = v.split('-');
+      const samples = {
+        chain:      'Langkah Pertama\nLangkah Kedua\nLangkah Ketiga\nHasil Akhir',
+        comparison: 'Aspek|Sebelum|Sesudah\nPendapatan|Rp 1.2jt|Rp 1.7jt\nAkses|Terbatas|Memadai',
+        list:       'Item pertama\nItem kedua\nItem ketiga',
+        hierarchy:  'Program Utama\n  Sub-program A\n  Sub-program B\n    Kegiatan',
+      };
+      return '<diagram type="' + type + '" size="' + size + '">\n' + (samples[type]||samples.list) + '\n</diagram>';
     },
     preview: (v) => {
+      const [type, size] = v.split('-');
       const samples = {
-        chain: 'Identifikasi\nAnalisis\nValidasi\nKesimpulan',
+        chain:      'Identifikasi\nAnalisis\nValidasi\nKesimpulan',
         comparison: 'Aspek|Sebelum Program|Sesudah Program\nPendapatan|Rp 1.2jt/bln|Rp 1.7jt/bln\nAkses Layanan|Terbatas|Memadai',
-        list: 'Poin pertama yang perlu diperhatikan\nPoin kedua sebagai kelanjutan\nPoin ketiga sebagai penutup',
-        hierarchy: 'Program Utama\n  Sub-program A\n  Sub-program B\n    Kegiatan detail',
+        list:       'Poin pertama yang perlu diperhatikan\nPoin kedua sebagai kelanjutan\nPoin ketiga sebagai penutup',
+        hierarchy:  'Program Utama\n  Sub-program A\n  Sub-program B\n    Kegiatan detail',
       };
-      return renderDiagram(samples[v]||samples.list, {type:v});
+      return '<diagram type="' + type + '" size="' + size + '">\n' + (samples[type]||samples.list) + '\n</diagram>';
     },
     prompt: (nodeNum, nodeName, babNum, babName) =>
-`Kamu adalah penulis laporan profesional.
-
-Untuk bagian "${nodeNum} — ${nodeName}", 
+`Untuk bagian "${nodeNum} — ${nodeName}", 
 buat konten diagram yang memvisualisasikan konsep utama bagian ini.
 
-Pilih tipe diagram yang paling sesuai:
-- chain: untuk alur proses atau tahapan
-- comparison: untuk membandingkan dua kondisi/alternatif  
-- list: untuk daftar item setara
-- hierarchy: untuk struktur bertingkat
+Tipe diagram:
+- chain: alur proses atau tahapan
+- comparison: membandingkan dua kondisi (format: Aspek|A|B per baris)
+- list: daftar item setara
+- hierarchy: struktur bertingkat (indentasi = level)
 
-Format contoh chain:
-<diagram type="chain">
-[tahap 1]
-[tahap 2]
-[tahap 3]
-</diagram>`,
+Sertakan size yang sesuai (half/third/quarter).`,
   },
 
   image: {
     label: 'Gambar — Placeholder Foto/Grafik',
     variants: [
-      { label: 'Foto', key: 'photo' },
-      { label: 'Grafik', key: 'chart' },
-      { label: 'Peta', key: 'map' },
+      { label: 'Full', key: 'full' },
+      { label: '2/3', key: 'two-third' },
+      { label: '1/2', key: 'half' },
+      { label: '1/3', key: 'third' },
     ],
-    syntax: (v) => {
-      const labels = { photo:'Foto dokumentasi kegiatan program', chart:'Grafik perkembangan indikator', map:'Peta wilayah dampingan program' };
-      return `<image placeholder="${labels[v]||'Deskripsi gambar'}" caption="Keterangan foto di sini"/>`;
-    },
-    preview: (v) => {
-      const labels = { photo:'Foto Dokumentasi Kegiatan', chart:'Grafik Data & Indikator', map:'Peta Wilayah Program' };
-      return renderImagePH({placeholder: labels[v]||'Gambar'});
-    },
+    syntax: (v) => `<image size="${v}" placeholder="Deskripsi foto atau grafik" caption="Keterangan gambar di sini"/>`,
+    preview: (v) => `<image size="${v}" placeholder="Foto Dokumentasi Kegiatan" caption="Keterangan foto"/>`,
     prompt: (nodeNum, nodeName, babNum, babName) =>
 `Untuk bagian "${nodeNum} — ${nodeName}", 
-deskripsikan gambar atau grafik apa yang paling tepat untuk memperkuat narasi bagian ini.
+deskripsikan gambar atau grafik yang paling tepat untuk memperkuat narasi.
 
 Pertimbangkan:
-- Foto dokumentasi kegiatan di lapangan
-- Grafik tren data kuantitatif
+- Foto dokumentasi kegiatan lapangan
+- Grafik tren data kuantitatif  
 - Peta lokasi program
 - Infografis proses atau alur
 
-Berikan deskripsi spesifik yang bisa dijadikan brief untuk fotografer/desainer.`,
+Berikan deskripsi spesifik sebagai brief untuk fotografer/desainer.`,
+  },
+
+  stat: {
+    label: 'Statistik — Data Highlight',
+    variants: [
+      { label: 'Hero', key: 'hero-quarter' },
+      { label: 'Hero 1/3', key: 'hero-third' },
+      { label: 'Portrait 3 — 1/3', key: 'portrait3-third' },
+      { label: 'Portrait 3 — 1/2', key: 'portrait3-half' },
+      { label: 'Landscape 2 — 1/4', key: 'landscape2-quarter' },
+      { label: 'Landscape 3 — 1/4', key: 'landscape3-quarter' },
+      { label: 'Landscape 3 — 1/3', key: 'landscape3-third' },
+      { label: 'Kontekstual — 1/3', key: 'contextual-third' },
+      { label: 'Kontekstual — 1/2', key: 'contextual-half' },
+    ],
+    syntax: (v) => {
+      const [variant, size] = v.split('-').reduce((a,c,i,arr) => {
+        if (i < arr.length-1) { a[0] = (a[0]?a[0]+'-':'')+c; } else { a[1]=c; } return a;
+      }, ['','']);
+      return `<stat variant="${variant}" size="${size||'quarter'}"/>`;
+    },
+    preview: (v) => {
+      const parts = v.split('-');
+      const size = parts[parts.length-1];
+      const variant = parts.slice(0,-1).join('-');
+      return `<stat variant="${variant}" size="${size||'quarter'}"/>`;
+    },
+    prompt: (nodeNum, nodeName, babNum, babName) =>
+`Untuk bagian "${nodeNum} — ${nodeName}", 
+identifikasi 1-3 angka/statistik kunci yang paling relevan.
+
+Format:
+<stat variant="hero" size="quarter"/>
+
+Setelah memilih variant dan size, ganti placeholder dengan:
+- value: angka aktual
+- unit: satuan (Rp, %, KK, dll)
+- label: deskripsi singkat
+
+Contoh data yang relevan untuk ${babName}:
+angka program, jumlah penerima manfaat, persentase perubahan.`,
   },
 };
 
@@ -4058,6 +4360,8 @@ Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu 
     previewRaw = LOREM_S + '\n\n' + blockSyntax + '\n\n' + LOREM_S;
   } else if (_bt === 'image') {
     previewRaw = LOREM_S + '\n\n' + blockSyntax + '\n\n' + LOREM_S;
+  } else if (_bt === 'stat') {
+    previewRaw = LOREM_S + '\n\n' + blockSyntax + '\n\n' + LOREM_S;
   } else {
     previewRaw = blockSyntax;
   }
@@ -4135,6 +4439,283 @@ function copyBlockPrompt() {
       toast('Prompt berhasil di-copy ✓');
     });
 }
+
+/* ══════════════════════════════════════════
+   BLOCK INSERT + CAPACITY
+══════════════════════════════════════════ */
+
+const BLOCK_FRACTIONS = {
+  'full': 1.0, 'two-third': 0.667, 'half': 0.5,
+  'third': 0.333, 'quarter': 0.25,
+  'auto': 0, // side/insight — tidak dihitung
+};
+
+const BLOCK_SYNTAX_DEFAULTS = {
+  body:       (s) => `<body size="${s}">\n${loremForSize(s)}\n</body>`,
+  image:      (s) => `<image size="${s}" placeholder="Foto / Grafik" caption="Keterangan gambar"/>`,
+  insight:    ()  => `<insight>\nJudul Panel Insight\nImplikasi strategis pertama\nImplikasi kedua\nImplikasi ketiga\n</insight>`,
+  side:       ()  => `<side>\nJudul Referensi\nNama Penulis / Lembaga, Tahun\nKutipan atau catatan penting.\n</side>`,
+  opener:     ()  => `<opener style="strong">\nJudul Pembuka Section\nDeskripsi singkat isi bagian ini.\n</opener>`,
+  pagebreak:  ()  => `<pagebreak/>`,
+  stat:       (s, variant) => `<stat variant="${variant}" size="${s}"/>`,
+  diagram:    (s, type)    => {
+    const samples = {
+      chain:      'Langkah Pertama\nLangkah Kedua\nLangkah Ketiga\nHasil Akhir',
+      comparison: 'Aspek|Sebelum|Sesudah\nKriteria 1|Nilai A|Nilai B\nKriteria 2|Nilai A|Nilai B',
+      list:       'Item pertama\nItem kedua\nItem ketiga',
+      hierarchy:  'Program Utama\n  Sub-program A\n  Sub-program B\n    Kegiatan',
+    };
+    return `<diagram type="${type}" size="${s}">\n${samples[type]||samples.list}\n</diagram>`;
+  },
+};
+
+function getPageCapacities(raw) {
+  // Split raw content by pagebreak, return array of capacity used per page
+  const pages = raw.split(/<pagebreak\s*\/?>\n?/i);
+  return pages.map(page => {
+    const blocks = parseTags(page);
+    let total = 0;
+    blocks.forEach(b => {
+      const size = b.attrs?.size;
+      const frac = BLOCK_FRACTIONS[size] || 0;
+      // opener counts as full
+      if (b.type === 'opener') total += 1.0;
+      else total += frac;
+    });
+    return Math.min(total, 1.5); // cap display at 150%
+  });
+}
+
+function getCurrentPageCapacity() {
+  const ta = document.getElementById('edRaw');
+  if (!ta) return { used: 0, pageIndex: 0 };
+  const raw = ta.value;
+  const pages = raw.split(/<pagebreak\s*\/?>\n?/i);
+  const caps = getPageCapacities(raw);
+  return { used: caps[caps.length - 1] || 0, pageIndex: pages.length - 1 };
+}
+
+function updateCapacityIndicator() {
+  const cap = document.getElementById('bpCapacity');
+  if (!cap) return;
+  const { used, pageIndex } = getCurrentPageCapacity();
+  const pct = Math.round(used * 100);
+  const pageLabel = pageIndex === 0 ? 'Halaman ini' : `Halaman ${pageIndex + 1}`;
+
+  if (used >= 1.0) {
+    cap.className = 'bp-capacity over';
+    cap.textContent = `⚠ ${pageLabel} penuh (${pct}%) — tambahkan halaman baru sebelum insert blok`;
+  } else if (used >= 0.75) {
+    cap.className = 'bp-capacity warn';
+    cap.textContent = `◐ ${pageLabel} ${pct}% terisi — perhatikan sisa ruang`;
+  } else {
+    cap.className = 'bp-capacity ok';
+    cap.textContent = `◯ ${pageLabel} ${pct}% terisi`;
+  }
+
+  // Update button states
+  document.querySelectorAll('.bp-size-btn').forEach(btn => {
+    btn.classList.remove('warn', 'blocked');
+  });
+  document.querySelectorAll('.bp-size-btn[onclick*="insertBlock"]').forEach(btn => {
+    const match = btn.getAttribute('onclick').match(/insertBlock\('([^']+)','([^']+)'/);
+    if (!match) return;
+    const typeRaw = match[1];
+    const size = match[2];
+    const frac = BLOCK_FRACTIONS[size] || 0;
+    const baseType = typeRaw.split('-')[0];
+    const addFrac = (baseType === 'opener') ? 1.0 : frac;
+    if (addFrac === 0) return; // side/insight tidak dihitung
+    const newTotal = used + addFrac;
+    if (newTotal > 1.0) btn.classList.add('blocked');
+    else if (newTotal > 0.85) btn.classList.add('warn');
+  });
+}
+
+function insertBlock(typeRaw, size, nodeNum, nodeName, babNum, babName) {
+  const ta = document.getElementById('edRaw');
+  if (!ta) return;
+
+  const { used } = getCurrentPageCapacity();
+  const parts = typeRaw.split('-');
+  const baseType = parts[0];
+  const subType  = parts.slice(1).join('-') || '';
+  const frac = BLOCK_FRACTIONS[size] || 0;
+  const addFrac = (baseType === 'opener') ? 1.0 : frac;
+
+  // Warning if over capacity
+  if (addFrac > 0 && (used + addFrac) > 1.0) {
+    const cap = document.getElementById('bpCapacity');
+    if (cap) {
+      cap.className = 'bp-capacity over';
+      cap.textContent = `⚠ Halaman penuh — tambahkan halaman baru dulu sebelum insert blok ini`;
+      cap.style.animation = 'none';
+      setTimeout(() => { cap.style.animation = ''; }, 50);
+    }
+    return; // block insert
+  }
+
+  // Generate syntax
+  let syntax = '';
+  if (baseType === 'body')      syntax = BLOCK_SYNTAX_DEFAULTS.body(size);
+  else if (baseType === 'image')    syntax = BLOCK_SYNTAX_DEFAULTS.image(size);
+  else if (baseType === 'insight')  syntax = BLOCK_SYNTAX_DEFAULTS.insight();
+  else if (baseType === 'side')     syntax = BLOCK_SYNTAX_DEFAULTS.side();
+  else if (baseType === 'opener')   syntax = BLOCK_SYNTAX_DEFAULTS.opener();
+  else if (baseType === 'pagebreak') syntax = BLOCK_SYNTAX_DEFAULTS.pagebreak();
+  else if (baseType === 'stat')     syntax = BLOCK_SYNTAX_DEFAULTS.stat(size, subType);
+  else if (baseType === 'diagram')  syntax = BLOCK_SYNTAX_DEFAULTS.diagram(size, subType);
+
+  if (!syntax) return;
+
+  // Append to textarea
+  const cur = ta.value;
+  const sep = cur.length > 0 && !cur.endsWith('\n\n') ? '\n\n' : '';
+  ta.value = cur + sep + syntax + '\n';
+  ta.dispatchEvent(new Event('input'));
+
+  updateCapacityIndicator();
+  showFloatLayout();
+  setTimeout(refreshFloatLayout, 50);
+  toast(`Blok ditambahkan`);
+}
+
+
+/* ══════════════════════════════════════════
+   FLOATING LAYOUT PREVIEW
+══════════════════════════════════════════ */
+
+let _floatPageIdx = 0;
+
+function getPageBlocks(raw) {
+  // Split by pagebreak, return array of block arrays
+  const pages = raw.split(/<pagebreak\s*\/?>\n?/gi);
+  return pages.map(p => parseTags(p));
+}
+
+function renderWireframePage(blocks) {
+  const WIRE_W = window.innerWidth - 64; // panel width minus padding
+  const WIRE_H = Math.round(WIRE_W * (247/210)); // A4 proportion (body area)
+
+  const FRAC = { full:1,'two-third':0.667,half:0.5,third:0.333,quarter:0.25 };
+
+  let mainBlocks = [];
+  let sideBlocks = [];
+  blocks.forEach(b => {
+    if (b.type==='side' || b.type==='insight') sideBlocks.push(b);
+    else if (['body','image','diagram','stat','opener'].includes(b.type)) mainBlocks.push(b);
+  });
+
+  const hasSide = sideBlocks.length > 0;
+  const mainW = hasSide ? Math.round(WIRE_W * 0.72) : WIRE_W;
+  const sideW = hasSide ? WIRE_W - mainW - 4 : 0;
+
+  function blockColor(b) {
+    if (b.type==='body')    return { bg:'#4a9eff22', pattern:'lines' };
+    if (b.type==='image')   return { bg:'#88888833', pattern:'diagonal' };
+    if (b.type==='diagram') return { bg:'#ACC42A22', pattern:'diagram' };
+    if (b.type==='stat')    return { bg:'#006CB822', pattern:'stat' };
+    if (b.type==='opener')  return { bg:'#ED1B2F22', pattern:'opener' };
+    return { bg:'#ffffff11', pattern:'none' };
+  }
+
+  function wireBlock(b, w, totalH) {
+    const frac = b.type==='opener' ? 1.0 : (FRAC[b.attrs?.size] || 0.25);
+    const h = Math.round(frac * totalH);
+    const { bg, pattern } = blockColor(b);
+    let inner = '';
+    if (pattern === 'lines') {
+      const n = Math.max(2, Math.floor(h/6));
+      inner = Array.from({length:n},(_,i) =>
+        `<div style="height:1px;background:#4a9eff66;margin:${Math.floor((h-n)/(n+1))}px 4px 0;width:${i===n-1?'60%':'90%'}"></div>`
+      ).join('');
+    } else if (pattern === 'diagonal') {
+      inner = `<div style="width:100%;height:100%;background:repeating-linear-gradient(45deg,#88888833 0,#88888833 2px,transparent 2px,transparent 8px);display:flex;align-items:center;justify-content:center;font-size:${Math.min(h/2,16)}px">🖼</div>`;
+    } else if (pattern === 'diagram') {
+      inner = `<div style="display:flex;align-items:center;justify-content:center;height:100%;gap:3px;padding:4px">
+        <div style="width:8px;height:8px;background:#ACC42A66;border-radius:1px"></div>
+        <div style="font-size:7px;color:#ACC42A">→</div>
+        <div style="width:8px;height:8px;background:#ACC42A66;border-radius:1px"></div>
+        <div style="font-size:7px;color:#ACC42A">→</div>
+        <div style="width:8px;height:8px;background:#ACC42A66;border-radius:1px"></div>
+      </div>`;
+    } else if (pattern === 'stat') {
+      inner = `<div style="display:flex;align-items:center;justify-content:center;height:100%;border-left:2px solid #006CB8;font-size:${Math.min(h*0.4,14)}px;font-weight:800;color:#006CB8;padding-left:4px">42</div>`;
+    } else if (pattern === 'opener') {
+      inner = `<div style="display:flex;align-items:center;height:100%;border-left:3px solid #ED1B2F;padding-left:6px;font-size:8px;color:#ED1B2F88">Opener</div>`;
+    }
+    return `<div style="width:${w}px;height:${h}px;background:${bg};border-bottom:1px solid #ffffff11;flex-shrink:0;overflow:hidden;position:relative;">${inner}</div>`;
+  }
+
+  const mainHtml = mainBlocks.map(b => wireBlock(b, mainW, WIRE_H)).join('');
+  const sideHtml = sideBlocks.map(b => {
+    const bg = b.type==='insight' ? '#2D4A6B44' : '#006CB811';
+    const border = b.type==='insight' ? '#2D4A6B' : '#006CB8';
+    return `<div style="background:${bg};border-left:2px solid ${border};padding:4px;font-size:7px;color:${border};margin-bottom:2px;">${b.type==='insight'?'💡':'📚'}</div>`;
+  }).join('');
+
+  const mainCol = `<div style="width:${mainW}px;display:flex;flex-direction:column;">${mainHtml}</div>`;
+  const sideCol = hasSide ? `<div style="width:${sideW}px;padding:4px;display:flex;flex-direction:column;">${sideHtml}</div>` : '';
+
+  // Capacity bar
+  let totalFrac = 0;
+  mainBlocks.forEach(b => {
+    totalFrac += b.type==='opener' ? 1.0 : (FRAC[b.attrs?.size] || 0);
+  });
+  const pct = Math.min(Math.round(totalFrac*100), 100);
+  const barColor = totalFrac >= 1.0 ? '#ef4444' : totalFrac >= 0.75 ? '#f59e0b' : '#22c55e';
+  const capBar = `<div style="height:3px;background:#ffffff11;">
+    <div style="height:3px;width:${pct}%;background:${barColor};transition:width .3s;"></div>
+  </div>`;
+
+  return `<div style="width:${WIRE_W}px;">${capBar}
+    <div style="display:flex;width:${WIRE_W}px;min-height:${Math.max(60,WIRE_H*0.4)}px;">
+      ${mainCol}${sideCol}
+    </div>
+  </div>`;
+}
+
+function showFloatLayout() {
+  const panel = document.getElementById('floatLayout');
+  if (!panel) return;
+  panel.style.display = 'block';
+  refreshFloatLayout();
+}
+
+function closeFloatLayout() {
+  const panel = document.getElementById('floatLayout');
+  if (panel) panel.style.display = 'none';
+}
+
+function refreshFloatLayout() {
+  const ta = document.getElementById('edRaw');
+  const wire = document.getElementById('floatPageWire');
+  const lbl  = document.getElementById('floatPageLabel');
+  if (!ta || !wire) return;
+
+  const allPages = getPageBlocks(ta.value);
+  const total = allPages.length;
+  _floatPageIdx = Math.max(0, Math.min(_floatPageIdx, total-1));
+
+  if (lbl) lbl.textContent = `Hal ${_floatPageIdx+1} / ${total}`;
+
+  const blocks = allPages[_floatPageIdx] || [];
+  wire.innerHTML = renderWireframePage(blocks);
+}
+
+function floatLayoutPrev() {
+  _floatPageIdx = Math.max(0, _floatPageIdx - 1);
+  refreshFloatLayout();
+}
+
+function floatLayoutNext() {
+  const ta = document.getElementById('edRaw');
+  if (!ta) return;
+  const total = getPageBlocks(ta.value).length;
+  _floatPageIdx = Math.min(total-1, _floatPageIdx+1);
+  refreshFloatLayout();
+}
+
 
 function exportICML() {
   if (!D) { toast('Tidak ada data', 'err'); return; }
