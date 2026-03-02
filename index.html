@@ -933,10 +933,22 @@ textarea.code {
     45deg, #d8d8d8, #d8d8d8 4px, #e8e8e8 4px, #e8e8e8 18px
   );
   display:flex; flex-direction:column; align-items:center; justify-content:center;
-  min-height:50mm; margin:3mm 0; gap:3mm;
+  min-height:50mm; margin:0; gap:3mm;
   border-radius:1mm;
 }
 .a4-img-ph-ico { font-size:20pt; color:#999; }
+.a4-img-wrap { margin:3mm 0 4mm; }
+.a4-img-caption {
+  display:flex; gap:1.5mm; align-items:baseline;
+  padding:1.5mm 0; border-top:.3mm solid #ddd; margin-top:1.5mm;
+  font-size:6pt; line-height:1.4;
+}
+.a4-img-index {
+  font-weight:700; color:#006CB8; white-space:nowrap;
+  font-family:'Geist Mono',monospace; letter-spacing:.04em; flex-shrink:0;
+}
+.a4-img-caption-text { color:#555; font-style:italic; }
+.a4-img-caption-placeholder { color:#bbb; font-style:italic; }
 .a4-img-ph-label { font-size:6.5pt; color:#777; font-style:italic; font-weight:600; text-align:center; padding:0 4mm; }
 
 /* Front matter pages */
@@ -3305,6 +3317,7 @@ function renderContentPage(raw, node, bab, num) {
   // Separate blocks into main column and side column
   let mainHtml = '';
   let sideHtml = '';
+  let imgCounter = 0;
   const hasSideBlocks = sty.showSide   && blocks.some(b => b.type==='side');
   const hasInsBlocks  = sty.showInsight && blocks.some(b => b.type==='insight');
   const hasSideCol = hasSideBlocks || hasInsBlocks;
@@ -3315,7 +3328,7 @@ function renderContentPage(raw, node, bab, num) {
     else if (b.type==='side' && sty.showSide) sideHtml += renderSideBlock(b.content);
     else if (b.type==='insight' && sty.showInsight) sideHtml += renderInsightBlock(b.content);
     else if (b.type==='diagram') mainHtml += renderDiagram(b.content, b.attrs);
-    else if (b.type==='image') mainHtml += renderImagePH(b.attrs);
+    else if (b.type==='image') { imgCounter++; mainHtml += renderImagePH(b.attrs, imgCounter); }
     else if (b.type==='text' && b.content) mainHtml += `<div class="a4-body-text">${b.content.split('\n\n').map(p=>`<p>${escRaw(p)}</p>`).join('')}</div>`;
   });
 
@@ -3445,10 +3458,19 @@ function renderDiagram(content, attrs={}) {
   </div>`;
 }
 
-function renderImagePH(attrs={}) {
-  return `<div class="a4-img-ph">
-    <div class="a4-img-ph-ico">🖼</div>
-    <div class="a4-img-ph-label">${esc(attrs.placeholder||'Gambar / Grafik')}</div>
+function renderImagePH(attrs={}, imgIndex=null) {
+  const label = attrs.placeholder || 'Gambar / Grafik';
+  const caption = attrs.caption || '';
+  const indexStr = imgIndex !== null ? `Gambar ${imgIndex}` : 'Gambar';
+  return `<div class="a4-img-wrap">
+    <div class="a4-img-ph">
+      <div class="a4-img-ph-ico">🖼</div>
+      <div class="a4-img-ph-label">${esc(label)}</div>
+    </div>
+    <div class="a4-img-caption">
+      <span class="a4-img-index">${esc(indexStr)}.</span>
+      ${caption ? `<span class="a4-img-caption-text">${esc(caption)}</span>` : `<span class="a4-img-caption-placeholder">Keterangan gambar</span>`}
+    </div>
   </div>`;
 }
 
@@ -3845,7 +3867,7 @@ Format contoh chain:
     ],
     syntax: (v) => {
       const labels = { photo:'Foto dokumentasi kegiatan program', chart:'Grafik perkembangan indikator', map:'Peta wilayah dampingan program' };
-      return `<image placeholder="${labels[v]||'Deskripsi gambar'}"/>`;
+      return `<image placeholder="${labels[v]||'Deskripsi gambar'}" caption="Keterangan foto di sini"/>`;
     },
     preview: (v) => {
       const labels = { photo:'Foto Dokumentasi Kegiatan', chart:'Grafik Data & Indikator', map:'Peta Wilayah Program' };
