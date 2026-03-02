@@ -937,17 +937,18 @@ textarea.code {
   border-radius:1mm;
 }
 .a4-img-ph-ico { font-size:20pt; color:#999; }
-.a4-img-wrap { margin:3mm 0 4mm; }
+.a4-img-wrap { margin:3mm 0 5mm; }
 .a4-img-caption {
-  display:flex; gap:1.5mm; align-items:baseline;
-  padding:1.5mm 0; border-top:.3mm solid #ddd; margin-top:1.5mm;
-  font-size:6pt; line-height:1.4;
+  display:flex; gap:2mm; align-items:baseline;
+  padding:2mm 0 1mm; border-top:.4mm solid #006CB8; margin-top:2mm;
+  font-size:6.5pt; line-height:1.5;
 }
 .a4-img-index {
   font-weight:700; color:#006CB8; white-space:nowrap;
-  font-family:'Geist Mono',monospace; letter-spacing:.04em; flex-shrink:0;
+  font-family:'Geist Mono',monospace; letter-spacing:.06em;
+  font-size:6pt; flex-shrink:0; text-transform:uppercase;
 }
-.a4-img-caption-text { color:#555; font-style:italic; }
+.a4-img-caption-text { color:#333; font-style:italic; }
 .a4-img-caption-placeholder { color:#bbb; font-style:italic; }
 .a4-img-ph-label { font-size:6.5pt; color:#777; font-style:italic; font-weight:600; text-align:center; padding:0 4mm; }
 
@@ -3044,7 +3045,8 @@ function openAddBM() {
 ══════════════════════════════════════════ */
 function parseTags(raw) {
   const blocks = [];
-  const tagRe = /<(pagebreak|toc)\s*\/?>|<(cover|endorsement|identity|foreword|opener|body|side|insight|diagram|image)([^>]*)>([\s\S]*?)<\/\2>/gi;
+  // Match: self-closing <image .../> OR paired <tag>...</tag> OR <pagebreak/>
+  const tagRe = /<(pagebreak|toc)\s*\/?>|<(image)([^>]*)\/?>|<(cover|endorsement|identity|foreword|opener|body|side|insight|diagram)([^>]*)>([\s\S]*?)<\/\4>/gi;
   let lastIdx = 0; let m;
   while ((m = tagRe.exec(raw)) !== null) {
     if (m.index > lastIdx) {
@@ -3052,11 +3054,17 @@ function parseTags(raw) {
       if (text) blocks.push({ type:'text', content:text });
     }
     if (m[1]) {
+      // pagebreak/toc
       blocks.push({ type: m[1].toLowerCase() });
-    } else {
-      const type = m[2].toLowerCase();
+    } else if (m[2]) {
+      // self-closing image
       const attrs = parseAttrs(m[3]);
-      const content = m[4]?.trim() || '';
+      blocks.push({ type:'image', attrs, content:'' });
+    } else {
+      // paired tag
+      const type = m[4].toLowerCase();
+      const attrs = parseAttrs(m[5]);
+      const content = m[6]?.trim() || '';
       blocks.push({ type, attrs, content });
     }
     lastIdx = m.index + m[0].length;
