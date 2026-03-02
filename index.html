@@ -3488,24 +3488,28 @@ function renderContentPage(raw, node, bab, num) {
   const firstBlock = blocks[0];
   const hasOpener = firstBlock?.type === 'opener';
 
+  // Heading always goes into main column (9/12)
+  let mainHtml = '';
   if (!hasOpener) {
-    body += renderNodeHeading(node, bab, t);
+    mainHtml += renderNodeHeading(node, bab, t);
   }
 
   // If no content, render placeholder
   if (!raw.trim() || !blocks.length) {
-    body += `<div style="color:#ccc;font-style:italic;font-size:8pt;margin-top:4mm;">Belum ada konten. Tap Editor untuk mulai menulis.</div>`;
+    mainHtml += `<div style="color:#ccc;font-style:italic;font-size:8pt;margin-top:4mm;">Belum ada konten. Tap Editor untuk mulai menulis.</div>`;
+    body += `<div style="display:flex;gap:4mm;"><div style="flex:3;min-width:0;">${mainHtml}</div><div style="flex:1;min-width:0;"></div></div>`;
     return `<div class="a4">${hdr}<div class="a4-body" style="padding:${m.t}mm ${m.r}mm ${m.b}mm ${m.l}mm;">${body}</div>${ftr}</div>`;
   }
 
   // Separate blocks into main column and side column
-  let mainHtml = '';
+  let _mainHtml = mainHtml; mainHtml = '';
   let sideHtml = '';
   let imgCounter = 0;
   const hasSideBlocks = sty.showSide   && blocks.some(b => b.type==='side');
   const hasInsBlocks  = sty.showInsight && blocks.some(b => b.type==='insight');
   const hasSideCol = hasSideBlocks || hasInsBlocks;
 
+  mainHtml = _mainHtml; // restore heading
   blocks.forEach(b => {
     if (b.type==='opener') mainHtml += renderOpener(b.content, b.attrs?.style||'subtle', node, t);
     else if (b.type==='body') mainHtml += renderBodyBlock(b.content, b.attrs);
@@ -3517,13 +3521,17 @@ function renderContentPage(raw, node, bab, num) {
     else if (b.type==='text' && b.content) mainHtml += `<div class="a4-body-text">${b.content.split('\n\n').map(p=>`<p>${escRaw(p)}</p>`).join('')}</div>`;
   });
 
+  // Always 9/12 layout — main col never full width
   if (hasSideCol) {
     body += `<div style="display:flex;gap:4mm;align-items:flex-start;">
       <div style="flex:3;min-width:0;">${mainHtml}</div>
       <div style="flex:1;min-width:0;">${sideHtml}</div>
     </div>`;
   } else {
-    body += mainHtml;
+    body += `<div style="display:flex;gap:4mm;align-items:flex-start;">
+      <div style="flex:3;min-width:0;">${mainHtml}</div>
+      <div style="flex:1;min-width:0;"></div>
+    </div>`;
   }
 
   return `<div class="a4">${hdr}<div class="a4-body" style="padding:${m.t}mm ${m.r}mm ${m.b}mm ${m.l}mm;">${body}</div>${ftr}</div>`;
@@ -3585,7 +3593,7 @@ function renderOpener(content, style, node, t) {
 function renderBodyBlock(content, attrs={}) {
   const paras = content.split(/\n\n+/).filter(p=>p.trim());
   const size = attrs?.size;
-  const heights = { 'full':247, 'two-third':165, 'half':124, 'third':82, 'quarter':62 };
+  const heights = { 'full':232, 'two-third':155, 'half':116, 'third':77, 'quarter':58 };
   const h = heights[size];
   const style = h ? `min-height:${h}mm;max-height:${h}mm;overflow:hidden;` : '';
   return `<div class="a4-body-text" style="${style}">${paras.map(p=>`<p>${escRaw(p.replace(/\n/g,' '))}</p>`).join('')}</div>`;
@@ -3616,10 +3624,10 @@ function renderInsightBlock(content, attrs={}) {
 
 function renderDiagram(content, attrs={}) {
   const size = attrs.size;
-  const heights = { 'full':247,'two-third':165,'half':124,'third':82,'quarter':62 };
+  const heights = { 'full':232,'two-third':155,'half':116,'third':77,'quarter':58 };
   const h = heights[size];
   const wrapSize = (html) => h
-    ? `<div style="min-height:${h}mm;max-height:${h}mm;overflow:hidden;">${html}</div>`
+    ? `<div style="min-height:${h}mm;max-height:${h}mm;overflow:hidden;background:#f9fbf4;border-radius:1.5mm;padding:2mm 0;">${html}</div>`
     : html;
 
   const type = attrs.type || 'list';
@@ -3659,7 +3667,7 @@ function renderImagePH(attrs={}, imgIndex=null) {
   const caption = attrs.caption || '';
   const indexStr = imgIndex !== null ? `Gambar ${imgIndex}` : 'Gambar';
   const size = attrs.size;
-  const heights = { 'full':220, 'two-third':145, 'half':105, 'third':65, 'quarter':45 };
+  const heights = { 'full':224, 'two-third':147, 'half':108, 'third':69, 'quarter':50 };
   const h = heights[size] || 50;
   const phStyle = `min-height:${h}mm;`;
   return `<div class="a4-img-wrap">
@@ -3677,8 +3685,8 @@ function renderImagePH(attrs={}, imgIndex=null) {
 function renderStat(attrs={}) {
   const variant = attrs.variant || 'hero';
   const size    = attrs.size    || 'quarter';
-  const heights = { 'full':247, 'two-third':165, 'half':124, 'third':82, 'quarter':62 };
-  const h = heights[size] || 62;
+  const heights = { 'full':232, 'two-third':155, 'half':116, 'third':77, 'quarter':58 };
+  const h = heights[size] || 58;
 
   // Default placeholder data per variant
   const defaults = {
@@ -3747,11 +3755,10 @@ function renderStat(attrs={}) {
    PREVIEW
 ══════════════════════════════════════════ */
 function renderNodePreview(nodeId) {
-  if (!D || !nodeId) { switchTab('preview'); return; }
+  if (!D || !nodeId) return;
   const node = getNode(nodeId);
-  if (!node) { switchTab('preview'); return; }
+  if (!node) return;
 
-  // Save current content first
   saveNodeContent(true);
 
   const bab = D.babs?.find(b => b.id === nodeId || findNodeInBab(b, nodeId)) || {};
@@ -3763,19 +3770,24 @@ function renderNodePreview(nodeId) {
   const rawPages = splitRawByPageBreak(node.rawContent || '');
   if (rawPages.length === 0) rawPages.push('');
 
+  // Temporarily block renderPreview
+  const _origRenderPreview = renderPreview;
+  window.renderPreview = () => {};
+
+  showScreen('screenPreview');
+  setActiveTab('bbPv');
+
   const scroll = document.getElementById('pvScroll');
   let arabicNum = 1;
   const pages = rawPages.map(raw => renderContentPage(raw, node, bab, arabicNum++));
   scroll.innerHTML = pages.join('');
-  applyZoom();
 
   const pageWord = pages.length > 1 ? `${pages.length} halaman` : '1 halaman';
   document.getElementById('pvInfo').textContent = `${node.num} ${node.name} — ${pageWord}`;
-
-  // Go to preview screen directly — bypass switchTab to avoid renderPreview() override
-  showScreen('screenPreview');
-  setActiveTab('bbPv');
   applyZoom();
+
+  // Restore after all sync calls done
+  setTimeout(() => { window.renderPreview = _origRenderPreview; }, 100);
 }
 
 function renderPreview() {
@@ -4004,7 +4016,7 @@ const SIZE_HEIGHTS = {
 
 const LOREM_POOL_W = 'Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua ut enim ad minim veniam quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur excepteur sint occaecat cupidatat non proident sunt in culpa qui officia deserunt mollit anim id est laborum sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium totam rem aperiam eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt neque porro quisquam est qui dolorem ipsum quia dolor sit amet consectetur adipisci velit'.split(' ');
 
-const LOREM_WORDS = { 'full':492, 'two-third':322, 'half':237, 'third':153, 'quarter':110 };
+const LOREM_WORDS = { 'full':478, 'two-third':319, 'half':239, 'third':159, 'quarter':119 };
 
 function loremForSize(size) {
   const n = LOREM_WORDS[size] || 237;
