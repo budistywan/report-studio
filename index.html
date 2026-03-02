@@ -3772,8 +3772,10 @@ function renderNodePreview(nodeId) {
   const pageWord = pages.length > 1 ? `${pages.length} halaman` : '1 halaman';
   document.getElementById('pvInfo').textContent = `${node.num} ${node.name} — ${pageWord}`;
 
-  _skipFullPreview = true;
-  switchTab('preview');
+  // Go to preview screen directly — bypass switchTab to avoid renderPreview() override
+  showScreen('screenPreview');
+  setActiveTab('bbPv');
+  applyZoom();
 }
 
 function renderPreview() {
