@@ -929,12 +929,20 @@ textarea.code {
 
 /* Image placeholder */
 .a4-img-ph {
-  border:1mm dashed #ccc; background:#fafafa;
+  background:#e0e0e0;
   display:flex; flex-direction:column; align-items:center; justify-content:center;
-  min-height:30mm; margin:3mm 0; gap:2mm;
+  min-height:50mm; margin:3mm 0; gap:3mm;
+  border-radius:1mm; position:relative; overflow:hidden;
 }
-.a4-img-ph-ico { font-size:16pt; color:#ccc; }
-.a4-img-ph-label { font-size:6.5pt; color:#aaa; font-style:italic; text-align:center; padding:0 4mm; }
+.a4-img-ph::before {
+  content:''; position:absolute; inset:0;
+  background: repeating-linear-gradient(
+    45deg, #d0d0d0, #d0d0d0 4px, #e0e0e0 4px, #e0e0e0 16px
+  );
+  opacity:0.4;
+}
+.a4-img-ph-ico { font-size:20pt; color:#aaa; position:relative; z-index:1; }
+.a4-img-ph-label { font-size:6.5pt; color:#888; font-style:italic; position:relative; z-index:1; font-weight:600; text-align:center; padding:0 4mm; }
 
 /* Front matter pages */
 .a4-fm-title { font-size:14pt; color:#006CB8; margin-bottom:8mm; font-weight:600; }
@@ -3981,11 +3989,25 @@ Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium dolor
   if (_bt === 'opener') {
     previewRaw = blockSyntax + '\n\n' + LOREM_A;
   } else if (_bt === 'body') {
+    // body variants: with-side and with-insight already include side/insight in blockSyntax
     previewRaw = blockSyntax;
   } else if (_bt === 'insight') {
-    previewRaw = LOREM_A + '\n\n' + blockSyntax;
+    // insight needs to be INSIDE body block to trigger 2-col layout
+    previewRaw = `<body>
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip.
+
+Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa.
+</body>
+
+` + blockSyntax;
   } else if (_bt === 'side') {
-    previewRaw = LOREM_A + '\n\n' + blockSyntax;
+    previewRaw = `<body>
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.
+
+Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident.
+</body>
+
+` + blockSyntax;
   } else if (_bt === 'diagram') {
     previewRaw = LOREM_S + '\n\n' + blockSyntax + '\n\n' + LOREM_S;
   } else if (_bt === 'image') {
