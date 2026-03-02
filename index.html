@@ -2319,13 +2319,16 @@ function enterEditor() {
   setActiveTab('bbEd');
 }
 
+let _skipFullPreview = false;
+
 function switchTab(t) {
   if (!D) return;
   if (t==='editor') {
     showScreen('screenEditor');
     setActiveTab('bbEd');
   } else if (t==='preview') {
-    renderPreview();
+    if (!_skipFullPreview) renderPreview();
+    _skipFullPreview = false;
     showScreen('screenPreview');
     setActiveTab('bbPv');
   } else if (t==='export') {
@@ -3769,6 +3772,7 @@ function renderNodePreview(nodeId) {
   const pageWord = pages.length > 1 ? `${pages.length} halaman` : '1 halaman';
   document.getElementById('pvInfo').textContent = `${node.num} ${node.name} — ${pageWord}`;
 
+  _skipFullPreview = true;
   switchTab('preview');
 }
 
