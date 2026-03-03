@@ -4833,26 +4833,32 @@ function exportICML() {
       .replace(/'/g,'&apos;');
 
     // ── ICML paragraph builders ─────────────────────────
+    // CRITICAL: <Br/> must be INSIDE ParagraphStyleRange, in its own CharacterStyleRange
+    // This is what creates an actual paragraph break in InDesign
+    const CS_NONE = 'CharacterStyle/$ID/[No character style]';
+    const PS_NONE = 'ParagraphStyle/$ID/[No paragraph style]';
+
     const para = (text, style) =>
-      `<ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/${x(style)}">` +
-      `<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">` +
-      `<Content>${x(text)}</Content>` +
-      `</CharacterStyleRange>` +
+      `<ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/${x(style)}">\n` +
+      `  <CharacterStyleRange AppliedCharacterStyle="${CS_NONE}">` +
+      `<Content>${x(text)}</Content></CharacterStyleRange>\n` +
+      `  <CharacterStyleRange AppliedCharacterStyle="${CS_NONE}"><Br/></CharacterStyleRange>\n` +
       `</ParagraphStyleRange>\n`;
 
     const paraRun = (runs, style) =>
-      `<ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/${x(style)}">` +
+      `<ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/${x(style)}">\n` +
       runs.map(([text, charStyle]) =>
-        `<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/${x(charStyle||'$ID/[No character style]')}">` +
-        `<Content>${x(text)}</Content>` +
-        `</CharacterStyleRange>`
+        `  <CharacterStyleRange AppliedCharacterStyle="CharacterStyle/${x(charStyle||'$ID/[No character style]')}">` +
+        `<Content>${x(text)}</Content></CharacterStyleRange>\n`
       ).join('') +
+      `  <CharacterStyleRange AppliedCharacterStyle="${CS_NONE}"><Br/></CharacterStyleRange>\n` +
       `</ParagraphStyleRange>\n`;
 
+    // Empty paragraph (blank line between sections)
     const br = () =>
-      `<ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/$ID/[No paragraph style]">` +
-      `<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">` +
-      `<Br/></CharacterStyleRange></ParagraphStyleRange>\n`;
+      `<ParagraphStyleRange AppliedParagraphStyle="${PS_NONE}">\n` +
+      `  <CharacterStyleRange AppliedCharacterStyle="${CS_NONE}"><Br/></CharacterStyleRange>\n` +
+      `</ParagraphStyleRange>\n`;
 
     // ── Style definitions ───────────────────────────────
     const typo = D.settings?.typography || 'scholarly';
@@ -4865,84 +4871,84 @@ function exportICML() {
 
     const stylesDef = `
   <RootParagraphStyleGroup Self="rootParagraphStyleGroup">
+    <ParagraphStyle Self="ParagraphStyle/$ID/[No paragraph style]" Name="$ID/[No paragraph style]"/>
+    <ParagraphStyle Self="ParagraphStyle/$ID/[Basic Paragraph]" Name="$ID/[Basic Paragraph]"
+      AppliedFont="${x(fonts.body)}" PointSize="11" Leading="18"/>
     <ParagraphStyle Self="ParagraphStyle/Heading 1" Name="Heading 1"
-      FontStyle="Bold" PointSize="24" Leading="30"
-      SpaceBefore="14.4" SpaceAfter="7.2"
-      AppliedFont="${x(fonts.display)}"
-      FillColor="Color/Blue" KeepWithNext="true"/>
+      AppliedFont="${x(fonts.display)}" FontStyle="Bold" PointSize="20" Leading="26"
+      SpaceBefore="14" SpaceAfter="7" FillColor="Color/Blue" KeepWithNext="true"/>
     <ParagraphStyle Self="ParagraphStyle/Heading 2" Name="Heading 2"
-      FontStyle="Bold" PointSize="16" Leading="22"
-      SpaceBefore="10.8" SpaceAfter="5.4"
-      AppliedFont="${x(fonts.display)}"
-      FillColor="Color/Black" KeepWithNext="true"/>
+      AppliedFont="${x(fonts.display)}" FontStyle="Bold" PointSize="16" Leading="22"
+      SpaceBefore="10" SpaceAfter="5" FillColor="Color/Black" KeepWithNext="true"/>
     <ParagraphStyle Self="ParagraphStyle/Heading 3" Name="Heading 3"
-      FontStyle="Bold" PointSize="13" Leading="18"
-      SpaceBefore="8" SpaceAfter="4"
-      AppliedFont="${x(fonts.body)}"
-      FillColor="Color/Black" KeepWithNext="true"/>
+      AppliedFont="${x(fonts.body)}" FontStyle="Bold" PointSize="13" Leading="18"
+      SpaceBefore="8" SpaceAfter="4" FillColor="Color/Black" KeepWithNext="true"/>
     <ParagraphStyle Self="ParagraphStyle/Heading 4" Name="Heading 4"
-      FontStyle="Bold Italic" PointSize="11" Leading="16"
-      SpaceBefore="6" SpaceAfter="3"
-      AppliedFont="${x(fonts.body)}"
-      FillColor="Color/Black" KeepWithNext="true"/>
+      AppliedFont="${x(fonts.body)}" FontStyle="Bold Italic" PointSize="11" Leading="16"
+      SpaceBefore="6" SpaceAfter="3" FillColor="Color/Black" KeepWithNext="true"/>
     <ParagraphStyle Self="ParagraphStyle/Body Text" Name="Body Text"
-      FontStyle="Regular" PointSize="10.5" Leading="16"
-      SpaceBefore="0" SpaceAfter="6"
-      AppliedFont="${x(fonts.body)}"
-      Justification="FullyJustified"/>
+      AppliedFont="${x(fonts.body)}" FontStyle="Regular" PointSize="11" Leading="19"
+      SpaceBefore="0" SpaceAfter="5.5" Justification="FullyJustified"/>
+    <ParagraphStyle Self="ParagraphStyle/Diagram Label" Name="Diagram Label"
+      AppliedFont="${x(fonts.body)}" FontStyle="Bold" PointSize="7" Leading="10"
+      SpaceBefore="6" SpaceAfter="2" FillColor="Color/Green"
+      Capitalization="AllCaps" Tracking="80"/>
+    <ParagraphStyle Self="ParagraphStyle/Diagram Item" Name="Diagram Item"
+      AppliedFont="${x(fonts.body)}" FontStyle="Regular" PointSize="9" Leading="13"
+      SpaceBefore="0" SpaceAfter="2"/>
     <ParagraphStyle Self="ParagraphStyle/Insight Title" Name="Insight Title"
-      FontStyle="Bold" PointSize="9" Leading="13"
-      SpaceBefore="4" SpaceAfter="3"
-      AppliedFont="${x(fonts.body)}"
-      FillColor="Color/Green"/>
+      AppliedFont="${x(fonts.body)}" FontStyle="Bold" PointSize="9" Leading="13"
+      SpaceBefore="4" SpaceAfter="3" FillColor="Color/Green"/>
     <ParagraphStyle Self="ParagraphStyle/Insight Item" Name="Insight Item"
-      FontStyle="Regular" PointSize="9" Leading="13"
-      SpaceBefore="0" SpaceAfter="2"
-      AppliedFont="${x(fonts.body)}"
-      FillColor="Color/LightGray"/>
+      AppliedFont="${x(fonts.body)}" FontStyle="Regular" PointSize="9" Leading="13"
+      SpaceBefore="0" SpaceAfter="2"/>
     <ParagraphStyle Self="ParagraphStyle/Side Title" Name="Side Title"
-      FontStyle="Bold" PointSize="9" Leading="13"
-      SpaceBefore="4" SpaceAfter="3"
-      AppliedFont="${x(fonts.body)}"
-      FillColor="Color/Blue"/>
+      AppliedFont="${x(fonts.body)}" FontStyle="Bold" PointSize="9" Leading="13"
+      SpaceBefore="4" SpaceAfter="3" FillColor="Color/Blue"/>
     <ParagraphStyle Self="ParagraphStyle/Side Item" Name="Side Item"
-      FontStyle="Regular" PointSize="9" Leading="13"
-      SpaceBefore="0" SpaceAfter="2"
-      AppliedFont="${x(fonts.body)}"/>
-    <ParagraphStyle Self="ParagraphStyle/Caption" Name="Caption"
-      FontStyle="Italic" PointSize="8.5" Leading="12"
-      SpaceBefore="2" SpaceAfter="6"
-      AppliedFont="${x(fonts.body)}"
-      FillColor="Color/Gray"/>
+      AppliedFont="${x(fonts.body)}" FontStyle="Regular" PointSize="9" Leading="13"
+      SpaceBefore="0" SpaceAfter="2"/>
+    <ParagraphStyle Self="ParagraphStyle/Caption Index" Name="Caption Index"
+      AppliedFont="${x(fonts.body)}" FontStyle="Bold" PointSize="7" Leading="10"
+      SpaceBefore="2" SpaceAfter="0" FillColor="Color/Blue"
+      Capitalization="AllCaps" Tracking="80"/>
+    <ParagraphStyle Self="ParagraphStyle/Caption Text" Name="Caption Text"
+      AppliedFont="${x(fonts.body)}" FontStyle="Italic" PointSize="8.5" Leading="12"
+      SpaceBefore="0" SpaceAfter="6" FillColor="Color/Gray"/>
+    <ParagraphStyle Self="ParagraphStyle/Image Placeholder" Name="Image Placeholder"
+      AppliedFont="${x(fonts.body)}" FontStyle="Italic" PointSize="9" Leading="13"
+      SpaceBefore="4" SpaceAfter="4" FillColor="Color/Gray" Justification="CenterAlign"/>
     <ParagraphStyle Self="ParagraphStyle/Cover Title" Name="Cover Title"
-      FontStyle="Bold" PointSize="32" Leading="38"
-      SpaceBefore="0" SpaceAfter="10"
-      AppliedFont="${x(fonts.display)}"
-      FillColor="Color/Blue"/>
+      AppliedFont="${x(fonts.display)}" FontStyle="Bold" PointSize="32" Leading="38"
+      SpaceBefore="0" SpaceAfter="10" FillColor="Color/Blue"/>
     <ParagraphStyle Self="ParagraphStyle/Cover Subtitle" Name="Cover Subtitle"
-      FontStyle="Italic" PointSize="14" Leading="20"
-      SpaceBefore="0" SpaceAfter="20"
-      AppliedFont="${x(fonts.body)}"
-      FillColor="Color/Gray"/>
+      AppliedFont="${x(fonts.body)}" FontStyle="Italic" PointSize="14" Leading="20"
+      SpaceBefore="0" SpaceAfter="20" FillColor="Color/Gray"/>
     <ParagraphStyle Self="ParagraphStyle/Cover Meta" Name="Cover Meta"
-      FontStyle="Regular" PointSize="11" Leading="16"
-      SpaceBefore="0" SpaceAfter="4"
-      AppliedFont="${x(fonts.body)}"/>
+      AppliedFont="${x(fonts.body)}" FontStyle="Regular" PointSize="11" Leading="16"
+      SpaceBefore="0" SpaceAfter="4"/>
+    <ParagraphStyle Self="ParagraphStyle/Stat Value" Name="Stat Value"
+      AppliedFont="${x(fonts.display)}" FontStyle="Bold" PointSize="32" Leading="36"
+      SpaceBefore="4" SpaceAfter="0" FillColor="Color/Blue" Justification="CenterAlign"/>
+    <ParagraphStyle Self="ParagraphStyle/Stat Label" Name="Stat Label"
+      AppliedFont="${x(fonts.body)}" FontStyle="Regular" PointSize="8" Leading="11"
+      SpaceBefore="2" SpaceAfter="6" FillColor="Color/Gray" Justification="CenterAlign"/>
   </RootParagraphStyleGroup>
 
   <RootCharacterStyleGroup Self="rootCharacterStyleGroup">
+    <CharacterStyle Self="CharacterStyle/$ID/[No character style]" Name="$ID/[No character style]"/>
     <CharacterStyle Self="CharacterStyle/Bold" Name="Bold" FontStyle="Bold"/>
     <CharacterStyle Self="CharacterStyle/Italic" Name="Italic" FontStyle="Italic"/>
     <CharacterStyle Self="CharacterStyle/Blue" Name="Blue" FillColor="Color/Blue"/>
   </RootCharacterStyleGroup>
 
   <RootColorGroup Self="rootColorGroup">
-    <Color Self="Color/Blue"  Model="Process" Space="CMYK" ColorValue="100 25 0 10"  Name="Blue"/>
-    <Color Self="Color/Red"   Model="Process" Space="CMYK" ColorValue="0 100 80 5"   Name="Red"/>
-    <Color Self="Color/Green" Model="Process" Space="CMYK" ColorValue="40 0 100 10"  Name="Green"/>
-    <Color Self="Color/Black" Model="Process" Space="CMYK" ColorValue="0 0 0 100"    Name="Black"/>
-    <Color Self="Color/Gray"  Model="Process" Space="CMYK" ColorValue="0 0 0 50"     Name="Gray"/>
-    <Color Self="Color/LightGray" Model="Process" Space="CMYK" ColorValue="0 0 0 20" Name="LightGray"/>
+    <Color Self="Color/Blue"      Model="Process" Space="CMYK" ColorValue="85 40 0 10"   Name="Blue"/>
+    <Color Self="Color/Red"       Model="Process" Space="CMYK" ColorValue="0 95 75 5"    Name="Red"/>
+    <Color Self="Color/Green"     Model="Process" Space="CMYK" ColorValue="50 0 90 15"   Name="Green"/>
+    <Color Self="Color/Black"     Model="Process" Space="CMYK" ColorValue="0 0 0 100"    Name="Black"/>
+    <Color Self="Color/Gray"      Model="Process" Space="CMYK" ColorValue="0 0 0 50"     Name="Gray"/>
+    <Color Self="Color/LightGray" Model="Process" Space="CMYK" ColorValue="0 0 0 20"     Name="LightGray"/>
   </RootColorGroup>`;
 
     // ── Content builder ─────────────────────────────────
@@ -4968,26 +4974,63 @@ function exportICML() {
             if (desc) content_xml += para(desc, 'Body Text');
           } else if (b.type === 'insight') {
             const lines = b.content.split('\n').filter(l => l.trim());
-            content_xml += para('Implikasi Strategis', 'Insight Title');
-            lines.forEach(line => content_xml += para('→ ' + line, 'Insight Item'));
+            const title = b.attrs?.title || lines[0] || 'Implikasi Strategis';
+            const items = b.attrs?.title ? lines : lines.slice(1);
+            content_xml += para('💡 ' + title, 'Insight Title');
+            items.forEach(line => content_xml += para('→ ' + line.replace(/^[-•]\s*/,''), 'Insight Item'));
             content_xml += br();
           } else if (b.type === 'side') {
             const lines = b.content.split('\n').filter(l => l.trim());
-            content_xml += para('Referensi', 'Side Title');
-            lines.forEach((line, i) => content_xml += para(line, 'Side Item'));
+            const title = b.attrs?.title || lines[0] || 'Referensi';
+            const items = b.attrs?.title ? lines : lines.slice(1);
+            content_xml += para('📚 ' + title, 'Side Title');
+            items.forEach(line => content_xml += para(line.replace(/^[-•]\s*/,''), 'Side Item'));
             content_xml += br();
           } else if (b.type === 'diagram') {
             const lines = b.content.split('\n').filter(l => l.trim());
             const type = b.attrs?.type || 'list';
-            content_xml += para('◆ Diagram — ' + type.toUpperCase(), 'Side Title');
+            const typeLabel = { chain:'Rantai', comparison:'Perbandingan', list:'Daftar', hierarchy:'Hierarki' }[type] || type;
+            content_xml += para('◆ ' + typeLabel.toUpperCase(), 'Diagram Label');
             if (type === 'chain') {
-              content_xml += para(lines.join(' → '), 'Body Text');
+              const items = lines.join(' → ').split('→').map(s=>s.trim()).filter(Boolean);
+              items.forEach((item, i) => {
+                content_xml += para((i > 0 ? '→ ' : '') + item, 'Diagram Item');
+              });
+            } else if (type === 'comparison') {
+              const headers = lines[0]?.split('|').map(s=>s.trim()) || [];
+              content_xml += para(headers.join('  |  '), 'Diagram Item');
+              lines.slice(1).forEach(row => {
+                const cells = row.split('|').map(s=>s.trim());
+                content_xml += para(cells.join('  |  '), 'Body Text');
+              });
+            } else if (type === 'hierarchy') {
+              lines.forEach(line => {
+                const indent = line.match(/^(\s*)/)[1].length;
+                const prefix = indent === 0 ? '▶ ' : indent <= 2 ? '  ▷ ' : '    · ';
+                content_xml += para(prefix + line.trim(), 'Diagram Item');
+              });
             } else {
-              lines.forEach(line => content_xml += para('• ' + line, 'Body Text'));
+              lines.forEach(line => content_xml += para('• ' + line.replace(/^[-•]\s*/,''), 'Diagram Item'));
             }
             content_xml += br();
           } else if (b.type === 'image') {
-            content_xml += para('[Gambar: ' + (b.attrs?.placeholder || 'Ilustrasi') + ']', 'Caption');
+            content_xml += para('[GAMBAR: ' + (b.attrs?.placeholder || 'Foto / Grafik') + ']', 'Image Placeholder');
+            if (b.attrs?.caption) {
+              content_xml += para('Keterangan gambar', 'Caption Index');
+              content_xml += para(b.attrs.caption, 'Caption Text');
+            }
+          } else if (b.type === 'stat') {
+            const variant = b.attrs?.variant || 'hero';
+            const defaults = {
+              hero: [{ value:'2,4 M', unit:'Rp', label:'Total Investasi' }],
+              portrait3: [{ value:'87%', label:'Kepuasan' },{ value:'1.2K', label:'Penerima' },{ value:'4.2x', label:'SROI' }],
+            };
+            const items = defaults[variant] || defaults.hero;
+            items.forEach(item => {
+              content_xml += para((item.unit ? item.unit + ' ' : '') + item.value, 'Stat Value');
+              content_xml += para(item.label || '', 'Stat Label');
+            });
+            content_xml += br();
           }
         });
         if (pi < parts.length - 1) content_xml += br();
